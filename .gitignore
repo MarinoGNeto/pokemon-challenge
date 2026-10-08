@@ -1,0 +1,42 @@
+# --- Challenge material (company document, do not publish) ---
+*.pdf
+!docs/**/*.pdf
+
+# --- Secrets / env ---
+.env
+.env.*
+!.env.example
+
+# --- OS / editors ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# --- Java / Maven ---
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.log
+hs_err_pid*
+
+# --- Gradle (in case) ---
+.gradle/
+build/
+
+# --- Node / frontend ---
+node_modules/
+dist/
+coverage/
+.vite/
+*.tsbuildinfo
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Claude Code local settings ---
+.claude/settings.local.json
