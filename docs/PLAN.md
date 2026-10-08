@@ -5,18 +5,27 @@ Target: **submit by Sunday 15:00** (3h buffer). Freeze features Saturday night.
 ## 0. Pre-flight (before writing code) — run on the dev machine
 
 ```powershell
-java -version          # 21+ expected
-./mvnw -v  (or mvn -v) # Maven available (wrapper will be generated)
-node -v ; npm -v       # Node 20/22 LTS+
-docker version ; docker compose version   # Docker Desktop running
-git --version ; gh --version              # gh optional, eases repo creation
-git config user.name ; git config user.email
+# Runs as-is in PowerShell. Maven is not needed globally: the wrapper (mvnw / mvnw.cmd)
+# is generated with the backend scaffold, then use `.\mvnw.cmd -v` inside backend\.
+java -version                                   # 21+ expected
+node -v                                         # Node 20/22/24 LTS
+npm -v
+docker version --format "{{.Server.Version}}"  # fails if Docker Desktop is not running
+docker compose version                          # Compose v2+
+git --version
+git config user.name
+git config user.email
+# Optional (eases repo creation / PRs; not required):
+gh --version
 ```
 
-- [ ] Docker Desktop running (needed for Postgres + Testcontainers)
-- [ ] Decide whether to move the repo to an ASCII path (`D:\dev\pokemon-challenge`) to avoid encoding issues
-- [ ] Rename default branch to `main` (`git branch -M main` after the first commit)
-- [ ] Create the **public** GitHub repo (e.g. `pokemon-challenge`), add remote, push the docs commit
+Result on the dev machine (2026-10-08): Java 21.0.12.1 LTS, Node 24.21.0, npm 11.19.0, Docker 29.8.2,
+Compose v5.5.1, git 2.56.0, identity `MarinoGNeto <marino.goncalvesneto@gmail.com>`.
+
+- [x] Docker Desktop running (needed for Postgres + Testcontainers)
+- [x] Repo path is ASCII (`D:\Programacao\pokemon-challenge`) — no move needed
+- [x] Default branch is `main`
+- [x] **Public** GitHub repo `MarinoGNeto/pokemon-challenge` created, remote added, docs commit pushed
 - [ ] Confirm the `Proposed` decisions in `docs/DECISIONS.md`
 
 ## 1. Thursday night — foundation

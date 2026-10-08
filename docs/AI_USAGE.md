@@ -34,3 +34,16 @@ model through [`CLAUDE.md`](../CLAUDE.md) (constraints, architecture rules, TDD,
 - Corrected / decided by me: architecture decisions left as *Proposed* until I confirm them; challenge PDF
   excluded from the public repo.
 - How validated: cross-checked every bullet of the PDF against `REQUIREMENTS.md`.
+
+### 2026-10-08 20:45 — Kickoff: toolchain pre-flight and plan fix
+- Goal: verify the toolchain before scaffolding; review the proposed ADRs.
+- Prompt (summary): "Read CLAUDE.md, REQUIREMENTS, DECISIONS, PLAN; check java/maven/node/npm/docker/git and report;
+  review DECISIONS.md (versions, Spring Boot compatibility, deadline risk); wait for confirmation."
+- Output accepted: the AI checked live sources instead of trusting memory — start.spring.io metadata showed
+  Spring Boot **4.1.1** as current GA (the ADR said 4.0.8), and Maven Central / the Boot 4.1.1 BOM were used to
+  verify library compatibility (springdoc 3.x, Testcontainers 2.x, WireMock standalone 3.x, Flyway 12, Jackson 3).
+- Rejected / corrected (and why): the AI's first environment check ran in a Linux sandbox (Java 11, no Docker),
+  not on my Windows machine — it flagged this itself and asked for the real output, which I ran in PowerShell.
+  I then spotted that the PLAN.md pre-flight block was not valid PowerShell (`./mvnw -v (or mvn -v)`, and the
+  wrapper does not exist before the scaffold) and had the AI replace it with a block that runs as-is.
+- How validated: the commands in the new block are exactly the ones I ran in PowerShell; GitHub API confirms the repo is public.
