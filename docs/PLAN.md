@@ -26,7 +26,7 @@ Compose v5.5.1, git 2.56.0, identity `MarinoGNeto <marino.goncalvesneto@gmail.co
 - [x] Repo path is ASCII (`D:\Programacao\pokemon-challenge`) — no move needed
 - [x] Default branch is `main`
 - [x] **Public** GitHub repo `MarinoGNeto/pokemon-challenge` created, remote added, docs commit pushed
-- [ ] Confirm the `Proposed` decisions in `docs/DECISIONS.md`
+- [x] Confirm the `Proposed` decisions in `docs/DECISIONS.md` (all Accepted 2026-10-08, see amendments)
 
 ## 1. Thursday night — foundation
 - [ ] Scaffold backend (Spring Initializr: web, validation, data-jpa, postgresql, flyway, security,

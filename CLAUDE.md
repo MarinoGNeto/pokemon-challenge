@@ -24,15 +24,17 @@ AI usage log (mandatory GenAI evaluation): [`docs/AI_USAGE.md`](docs/AI_USAGE.md
 6. A `Dockerfile` is required (per app) plus `docker-compose.yml` so the reviewer runs everything with one command.
 7. The app must start **pre-populated** with demo data and demo credentials.
 
-## Stack (see DECISIONS.md for rationale — confirm versions at kickoff)
+## Stack (see DECISIONS.md for rationale — versions confirmed at kickoff 2026-10-08)
 
-- **Backend:** Java 21 LTS (or 25 LTS), Spring Boot 4.x (latest stable), Maven wrapper.
+- **Backend:** Java 21 LTS, Spring Boot 4.1.1, Maven wrapper. Base package `com.marinogneto.pokemon`.
+  Boot 4 notes: Jackson 3 (`tools.jackson.*`), `spring-boot-starter-flyway`, per-module test starters.
   Spring Web (`RestClient`), Validation, Data JPA, Security (JWT via `spring-boot-starter-oauth2-resource-server`),
-  Flyway, PostgreSQL, Caffeine cache, springdoc-openapi.
-- **Tests:** JUnit 5, Mockito, AssertJ, WireMock (PokeAPI stubs), Testcontainers (Postgres),
+  Flyway 12, PostgreSQL 17, Caffeine cache, springdoc-openapi 3.1.x. Retries via Spring's `@Retryable` (no Resilience4j).
+- **Tests:** JUnit 5, Mockito, AssertJ, WireMock standalone 3.13.x (PokeAPI stubs), Testcontainers 2.x (Postgres),
   ArchUnit (enforces Clean Architecture dependency rules), JaCoCo coverage report.
+  `*Test` = unit/slice (Surefire, no Docker); `*IT` = integration (Failsafe, Docker required).
 - **Frontend:** React + TypeScript + Vite, React Router, TanStack Query (server state),
-  React Hook Form + Zod (forms/validation), Vitest + Testing Library. Responsive, accessible, **zero browser console warnings**.
+  React Hook Form + Zod (forms/validation), CSS Modules, Vitest + Testing Library. Responsive, accessible, **zero browser console warnings**.
 - **Infra:** `docker-compose.yml` with `postgres`, `backend`, `frontend` (nginx serving the build, proxying `/api`).
 
 ## Backend architecture (Clean / Hexagonal)

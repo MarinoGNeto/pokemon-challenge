@@ -47,3 +47,16 @@ model through [`CLAUDE.md`](../CLAUDE.md) (constraints, architecture rules, TDD,
   I then spotted that the PLAN.md pre-flight block was not valid PowerShell (`./mvnw -v (or mvn -v)`, and the
   wrapper does not exist before the scaffold) and had the AI replace it with a block that runs as-is.
 - How validated: the commands in the new block are exactly the ones I ran in PowerShell; GitHub API confirms the repo is public.
+
+### 2026-10-08 20:50 — Architecture decisions accepted with amendments
+- Goal: confirm the proposed ADRs before writing code.
+- Prompt (summary): "Review DECISIONS.md and challenge versions, Spring Boot compatibility and deadline risk."
+- Output accepted (all 12 points): Boot 4.1.1 instead of 4.0.8; Java 21 kept; Boot 4 modularisation and
+  Jackson 3 called out; library versions pinned after checking the Boot 4.1.1 BOM and Maven Central
+  (springdoc 3.1.1, Testcontainers 2.0.5, WireMock standalone 3.13.2, ArchUnit 1.5.1, JaCoCo 0.8.15);
+  H2 fallback dropped in favour of a `*Test` (no Docker) / `*IT` (Docker) split; Spring's `@Retryable`
+  instead of Resilience4j; `text[]` columns; `version` in PUT body for 409; CSS Modules; startup sync of
+  151 Pokémon dropped; explicit cut list (new ADR-012).
+- Rejected / corrected (and why): the draft ADR's "latest Spring Boot 4.0.8" came from model memory and was
+  already outdated — a reminder to check live sources for anything version-related.
+- How validated: start.spring.io metadata, `spring-boot-dependencies-4.1.1.pom`, springdoc 3.1.1 POM (Boot 4.1.0).
