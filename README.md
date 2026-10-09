@@ -21,7 +21,7 @@ proprietary fields — built with **Clean Architecture** and **TDD**.
 | Story | What it does | Endpoint(s) | Frontend |
 |---|---|---|---|
 | US01 Enumeration | Paginated list with sprite, category, mass (kg), skills (cached) | `GET /api/pokemon?page=0&size=20` (public) | _TBD_ |
-| US02 Detailed view | Image, stats, description, evolution chain | _TBD_ | _TBD_ |
+| US02 Detailed view | Official artwork, 6 core stats + total, English description, evolution tree with branches and conditions | `GET /api/pokemon/{id}` (public) | _TBD_ |
 | US03 Synchronization | Persist Pokémon locally + proprietary fields | _TBD_ | _TBD_ |
 | US04 Local modification | Validated update (400/404/409) | _TBD_ | _TBD_ |
 
@@ -60,6 +60,7 @@ Interactive docs: http://localhost:8080/swagger-ui.html (OpenAPI JSON at `/v3/ap
 | Method & path | Auth | Success | Errors |
 |---|---|---|---|
 | `GET /api/pokemon?page=0&size=20` | public | 200 page of summaries | 400 invalid paging, 502 PokeAPI unavailable |
+| `GET /api/pokemon/{id}` | public | 200 details with evolution tree | 400 invalid id, 404 unknown Pokémon, 502 PokeAPI unavailable |
 
 Paginated responses share one envelope: `{"items": [...], "page", "size", "totalElements", "totalPages"}`.
 Errors are RFC 9457 `application/problem+json` with `type` (`urn:pokemon-challenge:problem:*`), `title`, `status`,

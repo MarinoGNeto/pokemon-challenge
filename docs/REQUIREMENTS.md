@@ -34,9 +34,10 @@ User stories must be explicitly addressed in the final presentation.
 > parallel fetching matter (good talking point).
 
 ### US02 — Detailed view
-- [ ] Full data for a chosen Pokemon: **image** (official artwork), **core stats** (hp, attack, defense,
+- [x] Full data for a chosen Pokemon: **image** (official artwork), **core stats** (hp, attack, defense,
       sp. atk, sp. def, speed), **narrative description** (species flavor text, English, cleaned of `\f`/`\n`),
       **evolutionary lineage** (evolution chain, including branches e.g. Eevee)
+      — `GET /api/pokemon/{id}` (`GetPokemonDetails`, `PokemonDetailsResponse`, `GetPokemonDetailsIT` on Eevee)
 
 ### US03 — Data synchronization
 - [ ] Mechanism to **persist Pokemon data** into a **local relational store**

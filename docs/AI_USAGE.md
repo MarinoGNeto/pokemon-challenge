@@ -119,3 +119,20 @@ model through [`CLAUDE.md`](../CLAUDE.md) (constraints, architecture rules, TDD,
     stubs vanished) — the AI read the actual exception before changing anything.
 - How validated: 53 unit + 9 integration tests; merged coverage 97% instructions / 75% branches; live run of the
   jar against the real PokeAPI: first page 1.2 s, cached 12 ms; Swagger UI and the 400 problem checked by hand.
+
+### 2026-10-09 16:00 — US02: detail view with evolution tree
+- Goal: `GET /api/pokemon/{id}` with artwork, core stats, description and evolutionary lineage (incl. branches).
+- Prompt (summary): "ok, continue" (US02), strictly TDD.
+- Output accepted: `GetPokemonDetails` (Pokemon → species → evolution chain); response with the evolution tree
+  as nested nodes (`speciesId`, `name`, `condition`, `evolvesTo`) so the frontend renders Eevee's 8 branches
+  without reshaping; 404 problem for unknown ids; end-to-end test on the real Eevee fixtures.
+- Rejected / corrected (and why):
+  - The use case follows the ids PokeAPI returns instead of assuming species id = Pokémon id. Verified live with
+    Mega Venusaur (#10033 → species #3 → Bulbasaur's chain); a test pins the exact call sequence.
+  - Evolution nodes carry `speciesId`, not an image URL: building sprite URLs from an id would hard-code
+    PokeAPI's CDN layout in our API.
+  - Noticed in the live check: Espeon/Umbreon evolve by happiness + time of day, which the current
+    `EvolutionCondition` (trigger, level, item) does not carry, so they show only "level-up". Recorded as a known
+    limitation rather than silently widening scope.
+- How validated: 61 unit + 11 integration tests; live run against PokeAPI (Eevee 1.17 s cold; Mega Venusaur 0.27 s
+  thanks to the cached chain; `id=0` → 400 problem).
