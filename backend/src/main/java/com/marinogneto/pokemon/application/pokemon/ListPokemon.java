@@ -1,6 +1,7 @@
 package com.marinogneto.pokemon.application.pokemon;
 
 import com.marinogneto.pokemon.application.Page;
+import com.marinogneto.pokemon.application.Paging;
 import com.marinogneto.pokemon.application.port.out.CatalogPage;
 import com.marinogneto.pokemon.application.port.out.PokemonCatalog;
 import com.marinogneto.pokemon.domain.pokemon.Pokemon;
@@ -20,8 +21,7 @@ import java.util.concurrent.Executor;
  */
 public class ListPokemon {
 
-    /** Upper bound per page: keeps the fan-out to PokeAPI predictable. */
-    public static final int MAX_PAGE_SIZE = 50;
+    public static final int MAX_PAGE_SIZE = Paging.MAX_PAGE_SIZE;
 
     private final PokemonCatalog catalog;
     private final Executor executor;
@@ -36,12 +36,7 @@ public class ListPokemon {
      * @param size entries per page, 1..{@value #MAX_PAGE_SIZE}
      */
     public Page<PokemonSummary> handle(int page, int size) {
-        if (page < 0) {
-            throw new IllegalArgumentException("page must be zero or positive");
-        }
-        if (size < 1 || size > MAX_PAGE_SIZE) {
-            throw new IllegalArgumentException("size must be between 1 and " + MAX_PAGE_SIZE);
-        }
+        Paging.validate(page, size);
         CatalogPage catalogPage = catalog.listPokemon(Math.multiplyExact(page, size), size);
 
         List<CompletableFuture<PokemonSummary>> futures = catalogPage.entries().stream()
