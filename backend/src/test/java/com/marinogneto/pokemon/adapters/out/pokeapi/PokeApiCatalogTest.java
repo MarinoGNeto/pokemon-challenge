@@ -1,6 +1,7 @@
 package com.marinogneto.pokemon.adapters.out.pokeapi;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
@@ -40,7 +41,10 @@ import org.springframework.web.client.RestClient;
  */
 class PokeApiCatalogTest {
 
-    private static final Duration READ_TIMEOUT = Duration.ofMillis(500);
+    /** Realistic timeout for normal tests: the first request in the JVM pays class-loading/warm-up costs. */
+    private static final Duration READ_TIMEOUT = Duration.ofSeconds(5);
+    /** Deliberately tiny timeout, used only by the timeout test so it stays fast. */
+    private static final Duration SHORT_READ_TIMEOUT = Duration.ofMillis(300);
 
     @RegisterExtension
     static final WireMockExtension pokeApi = WireMockExtension.newInstance()
@@ -51,8 +55,7 @@ class PokeApiCatalogTest {
 
     @BeforeEach
     void createCatalog() {
-        catalog = PokeApiCatalog.create(RestClient.builder(),
-                URI.create(pokeApi.baseUrl() + "/api/v2"), Duration.ofSeconds(1), READ_TIMEOUT);
+        catalog = catalogWithReadTimeout(READ_TIMEOUT);
     }
 
     @Test
@@ -65,8 +68,8 @@ class PokeApiCatalogTest {
         assertThat(page.entries()).extracting("id", "name").containsExactly(
                 tuple(1, "bulbasaur"), tuple(2, "ivysaur"), tuple(3, "venusaur"));
         pokeApi.verify(getRequestedFor(urlPathEqualTo("/api/v2/pokemon"))
-                .withQueryParam("offset", com.github.tomakehurst.wiremock.client.WireMock.equalTo("0"))
-                .withQueryParam("limit", com.github.tomakehurst.wiremock.client.WireMock.equalTo("3")));
+                .withQueryParam("offset", equalTo("0"))
+                .withQueryParam("limit", equalTo("3")));
     }
 
     @Test
@@ -146,9 +149,10 @@ class PokeApiCatalogTest {
     @Test
     void slowResponseTimesOut() {
         pokeApi.stubFor(get("/api/v2/pokemon/1")
-                .willReturn(okJson(fixture("pokemon-1.json")).withFixedDelay((int) READ_TIMEOUT.toMillis() * 4)));
+                .willReturn(okJson(fixture("pokemon-1.json")).withFixedDelay((int) SHORT_READ_TIMEOUT.toMillis() * 5)));
+        PokeApiCatalog impatientCatalog = catalogWithReadTimeout(SHORT_READ_TIMEOUT);
 
-        assertThatThrownBy(() -> catalog.getPokemon(1)).isInstanceOf(CatalogUnavailableException.class);
+        assertThatThrownBy(() -> impatientCatalog.getPokemon(1)).isInstanceOf(CatalogUnavailableException.class);
     }
 
     @Test
@@ -163,6 +167,11 @@ class PokeApiCatalogTest {
         pokeApi.stubFor(get("/api/v2/pokemon/1").willReturn(okJson("{ this is not json")));
 
         assertThatThrownBy(() -> catalog.getPokemon(1)).isInstanceOf(CatalogUnavailableException.class);
+    }
+
+    private static PokeApiCatalog catalogWithReadTimeout(Duration readTimeout) {
+        return PokeApiCatalog.create(RestClient.builder(), URI.create(pokeApi.baseUrl() + "/api/v2"),
+                Duration.ofSeconds(2), readTimeout);
     }
 
     private static void stub(String path, String fixture) {
