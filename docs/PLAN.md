@@ -56,6 +56,12 @@ Compose v5.5.1, git 2.56.0, identity `MarinoGNeto <marino.goncalvesneto@gmail.co
 - [ ] Larger, centred evolution tree with more readable condition labels
 - [ ] Fill the empty space next to *Facts* on the desktop detail page
 - [ ] Weights without a trailing zero: "100 kg" instead of "100.0 kg" (keep one decimal when it is not zero)
+- [ ] Mobile header: "Sign in" wraps onto a second line — keep the account area on one line at 375 px
+- [ ] After a successful add, the add button turns into an "In the collection" state / link to the entry
+- [ ] Delete confirmation wording: "Our notes about it will be removed." (future tense — nothing is removed yet)
+- [ ] Wording: the collection is a shared team catalogue, not a personal list — "Add to my collection" →
+      "Add to the collection", nav/page title "Team collection", and no "my/your collection" anywhere
+      (button, sign-in prompt, success/refresh messages, "View it in …" link)
 
 ## 4. Sunday morning — GenAI exercise, docs, final QA
 - [ ] `genai-exercise/`: prompt → raw output commit → review commits → write-up (see its README)
