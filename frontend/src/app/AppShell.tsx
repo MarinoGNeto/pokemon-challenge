@@ -27,6 +27,11 @@ export function AppShell() {
                   Browse
                 </NavLink>
               </li>
+              <li>
+                <NavLink to="/collection" className={({ isActive }) => (isActive ? styles.active : undefined)}>
+                  Collection
+                </NavLink>
+              </li>
             </ul>
           </nav>
           <div className={styles.account}>

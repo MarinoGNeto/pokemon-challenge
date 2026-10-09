@@ -31,6 +31,11 @@ export interface RequestOptions {
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  return (await apiExchange<T>(path, options)).body
+}
+
+/** Like apiRequest, but also returns the status (e.g. 201 Created vs 200 OK for an idempotent sync). */
+export async function apiExchange<T>(path: string, options: RequestOptions = {}): Promise<{ status: number; body: T }> {
   const headers: Record<string, string> = { Accept: 'application/json, application/problem+json' }
   if (options.body !== undefined) {
     headers['Content-Type'] = 'application/json'
@@ -59,12 +64,12 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   }
 
   if (response.status === 204) {
-    return undefined as T
+    return { status: 204, body: undefined as T }
   }
   if (!response.ok) {
     throw new ApiError(response.status, await readProblem(response))
   }
-  return (await response.json()) as T
+  return { status: response.status, body: (await response.json()) as T }
 }
 
 async function readProblem(response: Response): Promise<Problem> {

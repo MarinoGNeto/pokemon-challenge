@@ -3,6 +3,7 @@ import { isRetryable } from '../../api/client'
 import type { PokemonDetails } from '../../api/types'
 import { LoadingState } from '../../shared/ui/LoadingState'
 import { ProblemMessage } from '../../shared/ui/ProblemMessage'
+import { AddToCollection } from '../collection/AddToCollection'
 import { TypeBadge } from '../../shared/ui/TypeBadge'
 import { usePokemonDetails } from './api'
 import { EvolutionTree } from './EvolutionTree'
@@ -71,6 +72,7 @@ function DetailsView({ pokemon, backLink }: { pokemon: PokemonDetails; backLink:
         <p className={styles.number}>{dexNumber(pokemon.id)}</p>
         <h1 className={styles.name}>{name}</h1>
       </div>
+      <AddToCollection pokeApiId={pokemon.id} name={pokemon.name} />
 
       <div className={styles.columns}>
         <div className={styles.left}>

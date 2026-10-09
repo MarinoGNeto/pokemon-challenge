@@ -1,6 +1,8 @@
 import type { RouteObject } from 'react-router'
 import { Navigate } from 'react-router'
 import { LoginPage } from '../features/auth/LoginPage'
+import { CollectionPage } from '../features/collection/CollectionPage'
+import { LocalPokemonPage } from '../features/collection/LocalPokemonPage'
 import { RegisterPage } from '../features/auth/RegisterPage'
 import { PokedexPage } from '../features/pokedex/PokedexPage'
 import { PokemonDetailPage } from '../features/pokedex/PokemonDetailPage'
@@ -14,6 +16,8 @@ export const routes: RouteObject[] = [
       { index: true, element: <Navigate to="/pokedex" replace /> },
       { path: 'pokedex', element: <PokedexPage /> },
       { path: 'pokedex/:id', element: <PokemonDetailPage /> },
+      { path: 'collection', element: <CollectionPage /> },
+      { path: 'collection/:id', element: <LocalPokemonPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
       { path: '*', element: <NotFoundPage /> },
