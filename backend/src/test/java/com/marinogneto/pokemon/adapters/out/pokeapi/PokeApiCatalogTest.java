@@ -140,6 +140,13 @@ class PokeApiCatalogTest {
     }
 
     @Test
+    void notFoundOnTheListIsAnUpstreamProblemNotAMissingPokemon() {
+        pokeApi.stubFor(get(urlPathEqualTo("/api/v2/pokemon")).willReturn(aResponse().withStatus(404)));
+
+        assertThatThrownBy(() -> catalog.listPokemon(0, 20)).isInstanceOf(CatalogUnavailableException.class);
+    }
+
+    @Test
     void serverErrorMeansTheCatalogIsUnavailable() {
         pokeApi.stubFor(get("/api/v2/pokemon/1").willReturn(aResponse().withStatus(503)));
 
