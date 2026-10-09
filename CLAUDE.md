@@ -33,7 +33,7 @@ AI usage log (mandatory GenAI evaluation): [`docs/AI_USAGE.md`](docs/AI_USAGE.md
 - **Tests:** JUnit 5, Mockito, AssertJ, WireMock standalone 3.13.x (PokeAPI stubs), Testcontainers 2.x (Postgres),
   ArchUnit (enforces Clean Architecture dependency rules), JaCoCo coverage report.
   `*Test` = unit/slice (Surefire, no Docker); `*IT` = integration (Failsafe, Docker required).
-- **Frontend:** React + TypeScript + Vite, React Router, TanStack Query (server state),
+- **Frontend:** React 19 + TypeScript 6 + Vite 8 (oxlint), React Router 8, TanStack Query 5 (server state), MSW 3 in tests,
   React Hook Form + Zod (forms/validation), CSS Modules, Vitest + Testing Library. Responsive, accessible, **zero browser console warnings**.
 - **Infra:** `docker-compose.yml` with `postgres`, `backend`, `frontend` (nginx serving the build, proxying `/api`).
 
@@ -86,6 +86,7 @@ cd backend && ./mvnw spring-boot:test-run  # app + throwaway Testcontainers Post
 # frontend
 cd frontend && npm ci && npm run dev
 cd frontend && npm test && npm run lint && npm run build
+cd frontend && npm run check:browser   # headless Chromium: console warnings, scroll, focus (stack must be running)
 
 # everything
 docker compose up --build

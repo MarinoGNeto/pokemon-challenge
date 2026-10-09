@@ -82,7 +82,7 @@ User stories must be explicitly addressed in the final presentation.
 - [ ] Thorough **unit test coverage** for every core component (+ integration tests; coverage report)
 
 ## Frontend
-- [ ] Modern framework (React chosen) integrated with the backend
+- [x] Modern framework (React chosen) integrated with the backend — React 19 + Vite, `/api` proxied
 - [ ] **Responsive**, user-centric design
 - [ ] Standard **CRUD** operations for the functional use cases
 - [ ] Clean component organization and efficient **state management**

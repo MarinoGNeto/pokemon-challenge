@@ -20,8 +20,8 @@ proprietary fields — built with **Clean Architecture** and **TDD**.
 ## User stories → implementation
 | Story | What it does | Endpoint(s) | Frontend |
 |---|---|---|---|
-| US01 Enumeration | Paginated list with sprite, category, mass (kg), skills (cached) | `GET /api/pokemon?page=0&size=20` (public) | _TBD_ |
-| US02 Detailed view | Official artwork, 6 core stats + total, English description, evolution tree with branches and conditions | `GET /api/pokemon/{id}` (public) | _TBD_ |
+| US01 Enumeration | Paginated list with sprite, category, mass (kg), skills (cached) | `GET /api/pokemon?page=0&size=20` (public) | `/pokedex?page=1` |
+| US02 Detailed view | Official artwork, 6 core stats + total, English description, evolution tree with branches and conditions | `GET /api/pokemon/{id}` (public) | `/pokedex/{id}` |
 | US03 Synchronization | Idempotent replication into PostgreSQL; proprietary fields (localized name, region, habitat, tags, notes) survive re-syncs | `POST /api/local-pokemon` (signed in), `GET /api/local-pokemon[/{id}]` (public) | _TBD_ |
 | US04 Local modification | Replace proprietary data with optimistic locking; delete (ADMIN) | `PUT /api/local-pokemon/{id}` (signed in), `DELETE …/{id}` (ADMIN) | _TBD_ |
 
@@ -52,6 +52,32 @@ Alternative without compose: `.\mvnw.cmd spring-boot:test-run` starts the app wi
 PostgreSQL (`TestPokemonApiApplication`).
 
 Optional: `$env:JWT_SECRET = "<at least 32 bytes>"` keeps tokens valid across restarts (see `.env.example`).
+
+### Local development (frontend)
+Prerequisites: Node 22.22+ (24 LTS recommended) and the backend running on `:8080`.
+
+```powershell
+cd frontend
+npm ci
+npm run dev        # http://localhost:5173 — /api is proxied to http://localhost:8080 (no CORS needed)
+npm test           # Vitest + Testing Library + MSW
+npm run lint       # oxlint (warnings fail)
+npm run build      # type-check + production build
+```
+
+**Frontend design.** React 19 + TypeScript + Vite; React Router 8 (page numbers live in the URL, so Back and shared
+links work); TanStack Query for all server state (catalogue cached 10 min in the browser, previous page kept on
+screen while the next loads, no retries on 4xx); feature folders (`features/pokedex`, `features/collection`,
+`features/auth`), shared UI in `shared/ui`, one CSS Module per component on top of design tokens. Every error shows
+the server's RFC 9457 title and detail. Visual direction "field device readout": cool neutral surfaces, one brand red
+for the mark and primary actions, Pokémon type colours as the only other colour (they always carry information),
+Barlow Condensed for names/numbers/stats and Atkinson Hyperlegible for text (self-hosted). The evolution tree is drawn
+as a branching diagram on wide screens and an indented tree on phones.
+
+**Zero console warnings.** `npm run check:browser` (Playwright; `npx playwright install chromium` once) opens every
+public page at 375 and 1280 px against a running stack and fails on any console warning or error. The only line it
+expects is Chrome's own network log for `/pokedex/99999`, a deliberately unknown Pokémon: the API correctly answers
+404 and Chrome logs every non-2xx response — page code cannot suppress that line.
 
 ## Demo credentials
 Seeded by Flyway (`V4__seed_demo_users.sql`). **Demo-only** — never reuse these anywhere.

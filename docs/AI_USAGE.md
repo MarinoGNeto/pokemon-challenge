@@ -197,3 +197,25 @@ model through [`CLAUDE.md`](../CLAUDE.md) (constraints, architecture rules, TDD,
   - Demo password hashes were generated with the app's own BCrypt encoder, not typed by hand.
 - How validated: 134 unit + 25 integration tests (merged coverage 97% / 83%); live run: Flyway → v4, admin login,
   `/me`, sync from live PokeAPI as admin (201), anonymous write → 401 problem, Swagger shows the Bearer scheme.
+
+### 2026-10-09 18:40 — Frontend stop 1: scaffold, Pokédex list (US01) and detail (US02)
+- Goal: React frontend for the public pages; all four US01 fields visible per entry; zero browser console warnings.
+- Prompt (summary): proposal first (screens, structure, state split, visual direction) → approved with two additions
+  (four US01 fields visible; return to the original page after login) → "build stop 1 and stop".
+- Output accepted: Vite + React 19 + TS scaffold; API client turning RFC 9457 problems into typed errors; URL-paged
+  list; detail page with stats table and a branching evolution tree (nested lists drawn as a diagram); 27 tests;
+  a committed Playwright check for console warnings, scroll and focus.
+- Rejected / corrected (and why):
+  - Versions checked on npm, not from memory: npm "latest" was TypeScript 7, but `typescript-eslint` only supports
+    TS < 6.1 and the official Vite template pins TS 6.0 and uses oxlint — followed the template instead of "latest".
+  - MSW 3 renamed `onUnhandledRequest` to `onUnhandledFrame`; found by reading MSW's own type definitions.
+  - The browser review (screenshots + console capture in headless Chromium against the real backend and live
+    PokeAPI) found three problems the unit tests could not: stat bars painted without their fill, no scroll
+    restoration (detail pages opened mid-page; Back lost the list position), and space-wasting desktop cards. All
+    fixed and re-verified with assertions (scroll 5360 → 0 → 5360; 3 px focus outline).
+  - A first scroll assertion was meaningless (the clicked Pokémon was at the top of the page); the AI noticed the
+    "0 → 0 → 0" result and changed the test to use the last entry.
+  - Console: development showed aborted requests (React StrictMode's intentional double mount) — checked against
+    the production build, which has none. The only remaining console line is Chrome's own network log for a
+    deliberate 404 (unknown Pokémon); documented instead of hiding a correct status code.
+- How validated: 27 Vitest tests, oxlint (warnings fail), type-check, production build, `npm run check:browser` OK.

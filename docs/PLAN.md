@@ -44,8 +44,8 @@ Compose v5.5.1, git 2.56.0, identity `MarinoGNeto <marino.goncalvesneto@gmail.co
 - [x] OpenAPI/Swagger UI reachable (with a Bearer "Authorize" button)
 
 ## 3. Saturday — frontend + packaging
-- [ ] Vite React TS scaffold, routing, API client, auth context
-- [ ] Pokedex list (paginated grid, responsive) and detail page (artwork, stats bars, description, evolution)
+- [x] Vite React TS scaffold, routing, API client (auth context comes with stop 2)
+- [x] Pokedex list (paginated grid, responsive) and detail page (artwork, stats bars, description, evolution)
 - [ ] Local catalogue: sync button, list, edit form (Zod), delete with confirm, error/empty/loading states
 - [ ] Frontend tests (Vitest + Testing Library) for key components/hooks
 - [ ] Dockerfiles (backend multi-stage, frontend nginx) + full `docker compose up --build` from a clean clone
