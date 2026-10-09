@@ -65,6 +65,8 @@ An ArchUnit test must fail the build if this is broken.
 - Errors: RFC 9457 `ProblemDetail` everywhere. 400 (validation), 401/403 (auth), 404 (not found),
   409 (conflict, e.g. already synced / duplicate username), 502/503 (PokeAPI failure). Never leak stack traces.
 - Every endpoint documented in OpenAPI; consistent response envelope for paginated lists.
+- **Never edit a committed Flyway migration.** Schema or seed changes go into a new `V<n>__*.sql`. Check with
+  `git log --diff-filter=M -- backend/src/main/resources/db/migration/` (must print nothing).
 - After any meaningful AI-assisted step, append an entry to `docs/AI_USAGE.md`
   (prompt summary, what was accepted, what was rejected/corrected and why). This feeds the presentation.
 - Prefer clarity over cleverness; this code will be reviewed live with the author explaining every line.

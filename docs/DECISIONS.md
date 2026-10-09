@@ -96,6 +96,12 @@ Public: browsing PokeAPI-backed endpoints (US01/US02), reading the local catalog
 Protected: sync, update, delete (ADMIN for delete; ADMIN bulk sync is on the cut list). Seeded demo users:
 `admin` / `user` (documented, demo-only).
 Frontend stores the token in memory (+ sessionStorage fallback), sends `Authorization: Bearer`.
+- *As implemented:* `roles` claim → `ROLE_*` authorities; the signing key comes from `JWT_SECRET` (≥ 32 bytes,
+  refused otherwise) or is random per start — no secret in git, zero setup for the reviewer; tokens last 1 h
+  (`JWT_TTL`); passwords 8 chars–72 bytes (BCrypt's limit); login answers unknown-user and wrong-password
+  identically and checks a dummy hash for unknown users (no username enumeration by message or timing); 401/403
+  are RFC 9457 bodies written by the security filter chain, keeping the `WWW-Authenticate: Bearer` challenge;
+  demo users seeded by Flyway `V4`. Out of scope: refresh tokens, logout/revocation, login rate limiting.
 
 ## ADR-009 — Frontend: React + TypeScript + Vite + TanStack Query
 **Status:** Accepted (*Amended at kickoff*)

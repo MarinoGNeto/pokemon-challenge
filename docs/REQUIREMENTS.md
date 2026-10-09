@@ -63,13 +63,13 @@ User stories must be explicitly addressed in the final presentation.
 - [ ] Any additional functionality (ideas: favourites/team builder, search by name, type filters, sync job status)
 
 ### Database
-- [ ] Relational DB with a **primary entity** (local Pokemon) and a **secondary collection for user management** (users)
+- [x] Relational DB with a **primary entity** (local Pokemon) and a **secondary collection for user management** (users) — Flyway V1 `pokemon`, V3 `users`
 - [x] Records have a **unique primary key** and **at least two descriptive attributes** — `pokemon.id` + many attributes (users table comes with auth)
 
 ### API
 - [x] Java Web API with **full CRUD** for the dataset — create = sync from PokeAPI, read, update, delete on `/api/local-pokemon`
 - [x] Standard HTTP verbs, required parameters, **consistent return structures** — one page envelope, one problem format
-- [ ] Auxiliary API for **user registration, authentication**, and **protected vs public routes**
+- [x] Auxiliary API for **user registration, authentication**, and **protected vs public routes** — `/api/auth/register|login|me`, JWT, public reads / signed-in writes / ADMIN delete (`AuthFlowIT`)
 
 ### Data layer
 - [x] Dedicated data access layer providing the foundation for controllers — `adapters.out.persistence` behind `LocalPokemonRepository`
@@ -90,7 +90,7 @@ User stories must be explicitly addressed in the final presentation.
 
 ## Submission / delivery
 - [ ] README with environment setup and technical documentation
-- [ ] Pre-populated **seed data** / **mock credentials** for the demo
+- [x] Pre-populated **seed data** / **mock credentials** for the demo — Flyway V2 (Pokémon #1–#12), V4 (`admin`/`user`), README
 - [ ] **Dockerfile** for containerized execution (+ docker-compose)
 
 ## Generative AI exercise (mandatory)

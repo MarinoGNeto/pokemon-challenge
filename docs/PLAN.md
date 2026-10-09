@@ -40,8 +40,8 @@ Compose v5.5.1, git 2.56.0, identity `MarinoGNeto <marino.goncalvesneto@gmail.co
 - [x] US02 detail: stats, description, evolution chain (tree mapping tested with branching fixtures)
 - [x] US03 sync/upsert + proprietary fields + Flyway migrations + seed
 - [x] US04 update/delete with validation (400/404/409) + ProblemDetail handler (PATCH cut, ADR-012)
-- [ ] Auth: register/login/JWT, public vs protected routes, seeded users
-- [ ] OpenAPI/Swagger UI reachable
+- [x] Auth: register/login/JWT, public vs protected routes, seeded users
+- [x] OpenAPI/Swagger UI reachable (with a Bearer "Authorize" button)
 
 ## 3. Saturday — frontend + packaging
 - [ ] Vite React TS scaffold, routing, API client, auth context

@@ -173,3 +173,27 @@ model through [`CLAUDE.md`](../CLAUDE.md) (constraints, architecture rules, TDD,
     calls the use cases directly until JWT sign-in exists.
 - How validated: 103 unit + 19 integration tests (merged coverage 98% instructions / 83% branches); live run on a
   fresh compose database (Flyway V1+V2, 12 seeded Pokémon, 401 on anonymous writes, 404 problem, OpenAPI paths).
+
+### 2026-10-09 17:20 — Migration hygiene question; authentication (register, login, JWT, 401/403)
+- Goal: answer "was a committed migration edited?", then add auth with seeded users and HTTP end-to-end write tests.
+- Prompt (summary): "Did you edit a migration that was already committed? … Then continue with auth … stop when green."
+- Migration answer: checked in git, not from memory — V1 and V2 were *added* in the US03 block and never modified
+  (`git log --diff-filter=M` on the migration folder is empty). The AI also corrected its own earlier advice:
+  `docker compose down -v` had not been necessary. Auth then added **new** V3/V4; the live run showed Flyway
+  applying only V3+V4 on top of an existing V2 database. The rule is now written into `CLAUDE.md`.
+- Output accepted: `User` domain (normalised identity, self-registration is always USER); `RegisterUser` /
+  `LoginUser` behind `UserRepository`, `PasswordHasher`, `TokenIssuer` ports; HS256 JWT via Spring's
+  `NimbusJwtEncoder/Decoder` (issuer + expiry validated); resource server with roles claim; 401/403 problem bodies;
+  `/api/auth/register|login|me`; Flyway V3 (users) and V4 (demo users); `AuthFlowIT` over real HTTP + real JWTs.
+- Rejected / corrected (and why):
+  - No JWT secret committed and no secret default in `application.properties`: missing `JWT_SECRET` → random key
+    per start (works out of the box, warns); a too-short secret fails fast.
+  - Password limit is 72 *bytes*, not characters: BCrypt silently ignores the rest (test uses 'é' = 2 bytes).
+  - Login treats unknown users and wrong passwords identically, including a dummy hash check for timing.
+  - `role` cannot be sent at registration: the strict-JSON rule from US04 rejects it as an unknown field.
+  - Checked the Spring Security 7.1 jar for the HMAC encoder builder before writing code (no guessed APIs).
+  - Security slices needed `Clock` from the persistence wiring → extracted `ClockConfiguration`, and
+    `SecurityConfiguration` imports `JwtConfiguration`, so slices are self-contained.
+  - Demo password hashes were generated with the app's own BCrypt encoder, not typed by hand.
+- How validated: 134 unit + 25 integration tests (merged coverage 97% / 83%); live run: Flyway → v4, admin login,
+  `/me`, sync from live PokeAPI as admin (201), anonymous write → 401 problem, Swagger shows the Bearer scheme.

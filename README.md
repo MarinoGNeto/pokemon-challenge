@@ -51,14 +51,27 @@ cd backend
 Alternative without compose: `.\mvnw.cmd spring-boot:test-run` starts the app with a throwaway Testcontainers
 PostgreSQL (`TestPokemonApiApplication`).
 
+Optional: `$env:JWT_SECRET = "<at least 32 bytes>"` keeps tokens valid across restarts (see `.env.example`).
+
 ## Demo credentials
-_TBD (demo-only, seeded by Flyway)._
+Seeded by Flyway (`V4__seed_demo_users.sql`). **Demo-only** — never reuse these anywhere.
+
+| Username | Password | Role | Can |
+|---|---|---|---|
+| `admin` | `Admin#2026` | ADMIN | everything, including deleting local Pokémon |
+| `user` | `User#2026` | USER | sync and edit local Pokémon |
+
+Anyone can also register (`POST /api/auth/register`); self-registered accounts are always USER.
+In Swagger UI: `POST /api/auth/login` → copy `accessToken` → **Authorize** → paste.
 
 ## API
 Interactive docs: http://localhost:8080/swagger-ui.html (OpenAPI JSON at `/v3/api-docs`).
 
 | Method & path | Auth | Success | Errors |
 |---|---|---|---|
+| `POST /api/auth/register` `{"username","email","password"}` | public | 201 user (never the password) | 400 per-field / unknown field (e.g. `role`), 409 already registered |
+| `POST /api/auth/login` `{"username","password"}` | public | 200 `{"accessToken","tokenType":"Bearer","expiresAt","username","role"}` | 400, 401 invalid credentials |
+| `GET /api/auth/me` | signed in | 200 `{"username","roles"}` | 401 |
 | `GET /api/pokemon?page=0&size=20` | public | 200 page of summaries | 400 invalid paging, 502 PokeAPI unavailable |
 | `GET /api/pokemon/{id}` | public | 200 details with evolution tree | 400 invalid id, 404 unknown Pokémon, 502 PokeAPI unavailable |
 | `GET /api/local-pokemon?page=0&size=20` | public | 200 page of local Pokémon | 400 invalid paging |
@@ -71,6 +84,13 @@ Paginated responses share one envelope: `{"items": [...], "page", "size", "total
 Errors are RFC 9457 `application/problem+json` with `type` (`urn:pokemon-challenge:problem:*`), `title`, `status`,
 `detail`, `instance` and, for validation, `errors: [{"field", "message"}]`. Stack traces and internal messages are
 never returned.
+
+**Authentication (ADR-008).** Stateless JWT (HS256) issued by `/api/auth/login`, valid 1 h, verified by Spring
+Security's resource server; the `roles` claim drives `hasRole(...)`. Reads are public, writes need a token, deletes
+need ADMIN. 401 and 403 are problem bodies too, with the RFC 6750 `WWW-Authenticate: Bearer` challenge. The signing
+secret comes from `JWT_SECRET` (≥ 32 bytes) and is never committed; without it the app uses a random key per start.
+Passwords are BCrypt-hashed, limited to 72 bytes (BCrypt ignores the rest), and login gives the same answer — in the
+same time — for an unknown user and a wrong password.
 
 **Local replica (US03/US04).** A local Pokémon has two parts with different owners: `catalog` is copied from
 PokeAPI on every sync and is read-only through the API (sending `name` in a PUT is a 400 "not an editable field");
