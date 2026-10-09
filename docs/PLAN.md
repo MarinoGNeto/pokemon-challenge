@@ -48,7 +48,7 @@ Compose v5.5.1, git 2.56.0, identity `MarinoGNeto <marino.goncalvesneto@gmail.co
 - [x] Pokedex list (paginated grid, responsive) and detail page (artwork, stats bars, description, evolution)
 - [x] Local catalogue: sync button, list, edit form (Zod), delete with confirm, error/empty/loading states
 - [x] Frontend tests (Vitest + Testing Library + MSW) for key components/hooks — 51 tests
-- [ ] Dockerfiles (backend multi-stage, frontend nginx) + full `docker compose up --build` from a clean clone
+- [x] Dockerfiles (backend multi-stage, frontend nginx) + full `docker compose up --build` from a clean clone
 - [x] Zero browser console warnings check — `npm run check:browser`
 
 ### Polish backlog (later — not part of the current stops)

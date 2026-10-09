@@ -91,7 +91,7 @@ User stories must be explicitly addressed in the final presentation.
 ## Submission / delivery
 - [ ] README with environment setup and technical documentation
 - [x] Pre-populated **seed data** / **mock credentials** for the demo — Flyway V2 (Pokémon #1–#12), V4 (`admin`/`user`), README
-- [ ] **Dockerfile** for containerized execution (+ docker-compose)
+- [x] **Dockerfile** for containerized execution (+ docker-compose) — `backend/Dockerfile`, `frontend/Dockerfile`, `docker compose up --build` verified from a fresh clone
 
 ## Generative AI exercise (mandatory)
 Scenario: generate a RESTful API for a **task management system**:

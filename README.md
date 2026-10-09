@@ -29,14 +29,35 @@ proprietary fields — built with **Clean Architecture** and **TDD**.
 _TBD — diagram + layer description. Decisions: [`docs/DECISIONS.md`](docs/DECISIONS.md)._
 
 ## Quick start
-Prerequisites: Docker (Desktop) with Compose v2.
+Prerequisites: Docker (Desktop) with Compose v2. Nothing else — no Java, Node or `.env` needed.
 
 ```bash
 git clone <repo-url> && cd pokemon-challenge
-cp .env.example .env
 docker compose up --build
-# Frontend: http://localhost:5173 (TBD)  ·  API: http://localhost:8080  ·  Swagger UI: http://localhost:8080/swagger-ui.html
 ```
+
+| What | URL |
+|---|---|
+| App | http://localhost:3000 |
+| API | http://localhost:8080/api/pokemon |
+| Swagger UI | http://localhost:8080/swagger-ui.html |
+| Health | http://localhost:8080/actuator/health |
+
+The first build takes a few minutes (Maven and npm downloads); later builds reuse the caches. Sign in with the
+[demo credentials](#demo-credentials). The database starts with 12 Pokémon and the two demo users; the Pokédex itself
+needs internet access (it reads PokeAPI live). `docker compose down` stops everything; add `-v` to also delete the
+database volume and start from the seed again.
+
+| Service | Image | Notes |
+|---|---|---|
+| `postgres` | `postgres:17-alpine` | published on `127.0.0.1:5432` only, for running the backend outside Docker |
+| `backend` | `backend/Dockerfile` — Maven/JDK 21 build → layered JRE 21 runtime | non-root; healthy when `/actuator/health` (incl. the database) is UP |
+| `frontend` | `frontend/Dockerfile` — Node 24 build → unprivileged nginx | serves the bundle with an SPA fallback and proxies `/api` to the backend (one origin, no CORS) |
+
+Each service starts when the previous one is healthy. Ports and credentials can be changed in an optional `.env`
+(copy `.env.example`): `FRONTEND_PORT`, `BACKEND_PORT`, `POSTGRES_PORT`, `POSTGRES_*`, and `JWT_SECRET` (without it,
+tokens are signed with a random key and do not survive a backend restart). The image builds only package; tests run as
+described in [Testing](#testing).
 
 ### Local development (backend)
 Prerequisites: Java 21, Docker. Maven is not needed — use the wrapper.
@@ -81,7 +102,8 @@ Barlow Condensed for names/numbers/stats and Atkinson Hyperlegible for text (sel
 as a branching diagram on wide screens and an indented tree on phones.
 
 **Zero console warnings.** `npm run check:browser` (Playwright; `npx playwright install chromium` once) opens every
-page at 375 and 1280 px against a running stack, walks the signed-in journey with the demo admin (sign in from a
+page at 375 and 1280 px against a running stack (`BASE_URL`, default the dev server on :5173; use
+`http://localhost:3000` for the Docker stack), walks the signed-in journey with the demo admin (sign in from a
 Pokémon page and come back, add, edit, a validation error, delete with confirmation), and fails on any console
 warning or error. The only line it
 expects is Chrome's own network log for `/pokedex/99999`, a deliberately unknown Pokémon: the API correctly answers

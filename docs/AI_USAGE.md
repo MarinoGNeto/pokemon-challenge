@@ -239,3 +239,31 @@ model through [`CLAUDE.md`](../CLAUDE.md) (constraints, architecture rules, TDD,
     input (now only while the form is not dirty, with a test) and a full-width Delete button on desktop.
 - How validated: 51 Vitest tests, oxlint, type-check, build; `npm run check:browser` (13 routes + signed-in
   journey at 375/1280 px) OK on both the dev server and the production build against the real backend.
+
+### 2026-10-09 22:45 — Containerisation: Dockerfiles + one-command compose
+- Goal: backend multi-stage image, frontend on nginx, `docker compose up --build` working from a fresh clone;
+  plus five polish-backlog items recorded in PLAN.md (not implemented).
+- Prompt (summary): "Add [the backlog items] … Then continue with the Dockerfiles (backend multi-stage, frontend on
+  nginx) and a full `docker compose up --build` from a fresh clone. Stop when it works end to end."
+- Output accepted: backend = official Maven 3.9.16/JDK 21 image (no wrapper download, no CRLF risk) → Spring Boot
+  layer extraction → JRE 21 alpine, non-root, `-XX:MaxRAMPercentage=75`, health check on `/actuator/health`;
+  frontend = Node 24 build → `nginx-unprivileged` (non-root, :8080) with SPA fallback, `/api` proxy, immutable
+  caching for fingerprinted assets, `no-cache` for index.html, basic security headers; compose waits on health
+  checks, builds the in-container DB URL from `POSTGRES_*` (so a copied `.env` with `DB_URL=localhost` cannot break
+  it), publishes Postgres on 127.0.0.1 only, and needs no `.env` at all.
+- Rejected / corrected (and why):
+  - `mvn dependency:go-offline` as a separate cached layer: with a BuildKit cache mount for `~/.m2` it adds
+    nothing and downloads plugins the build never runs (maven-site-plugin) — removed in a follow-up commit.
+  - nginx `expires 1y` + `add_header Cache-Control` sent two `Cache-Control` headers — found with `curl -I`,
+    replaced by a single header.
+  - Static `proxy_pass http://backend:8080` resolves once at startup; switched to Docker's DNS resolver with a
+    variable, verified by recreating the backend container (new IP) and calling `/api` through nginx again.
+  - Server-level `add_header` would also duplicate the security headers Spring Security already sends on `/api`;
+    the headers are set only on the static locations.
+- Verification environment note: the AI's cloud sandbox reaches the internet only through a TLS-intercepting
+  proxy, so it verified with *sandbox-only* wrappers kept out of the repo (base images re-tagged with the proxy CA,
+  a compose override for the build network/proxy). The committed Dockerfiles and compose file were used unchanged.
+- How validated: fresh `git clone` → `docker compose up --build --wait` (no `.env`): all three services healthy in
+  ~1m40s; health UP with db; seeded 12 local Pokémon; Eevee from live PokeAPI through nginx; admin login + sync
+  (201) + 401 ProblemDetail through nginx; Swagger 200; `npm run check:browser` against http://localhost:3000
+  (13 routes + signed-in journey at 375/1280 px) OK with only the expected 404 line; no ERROR in backend logs.
