@@ -14,10 +14,9 @@
 FROM maven:3.9.16-eclipse-temurin-21 AS build
 WORKDIR /workspace
 
-# The pom first: dependencies are resolved into a BuildKit cache that survives rebuilds.
+# The local Maven repository is a BuildKit cache mount: dependencies are downloaded once and reused by later
+# builds, even when pom.xml changes.
 COPY pom.xml ./
-RUN --mount=type=cache,target=/root/.m2 mvn -B -q dependency:go-offline
-
 COPY src ./src
 RUN --mount=type=cache,target=/root/.m2 mvn -B -q -DskipTests package \
     && cp target/pokemon-api-*.jar application.jar
