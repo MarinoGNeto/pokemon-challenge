@@ -72,7 +72,11 @@ function LocalPokemonView({ pokemon }: { pokemon: LocalPokemon }) {
         <h1 className={styles.name}>{name}</h1>
         {proprietary.localizedName && <p className={styles.localized}>{proprietary.localizedName}</p>}
       </div>
-      {session?.role === 'ADMIN' && <DeleteLocalPokemon id={pokemon.id} name={catalog.name} />}
+      {session?.role === 'ADMIN' && (
+        <div className={styles.adminActions}>
+          <DeleteLocalPokemon id={pokemon.id} name={catalog.name} />
+        </div>
+      )}
 
       <div className={styles.columns}>
         <div className={styles.stack}>

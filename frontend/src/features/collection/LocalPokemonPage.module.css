@@ -125,3 +125,8 @@
   gap: var(--space-5);
   align-content: start;
 }
+
+/* Keeps the Delete button (and its confirmation) at its natural width inside the page grid. */
+.adminActions {
+  justify-self: start;
+}

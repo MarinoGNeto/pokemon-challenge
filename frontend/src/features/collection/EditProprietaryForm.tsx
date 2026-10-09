@@ -18,7 +18,7 @@ export function EditProprietaryForm({ pokemon }: { pokemon: LocalPokemon }) {
   const latest = useLocalPokemon(pokemon.id)
   const [outcome, setOutcome] = useState<Outcome>(null)
   const form = useForm<EditValues>({ resolver: zodResolver(editSchema), defaultValues: formValues(pokemon) })
-  const { errors, isSubmitting } = form.formState
+  const { errors, isSubmitting, isDirty } = form.formState
 
   const onSubmit = form.handleSubmit(async (values) => {
     setOutcome(null)
@@ -73,7 +73,8 @@ export function EditProprietaryForm({ pokemon }: { pokemon: LocalPokemon }) {
         <button type="submit" className={styles.save} disabled={isSubmitting}>
           {isSubmitting ? 'Saving…' : 'Save changes'}
         </button>
-        {outcome?.kind === 'saved' && <output className={styles.saved}>Changes saved.</output>}
+        {/* Only true while the form still matches what was saved. */}
+        {outcome?.kind === 'saved' && !isDirty && <output className={styles.saved}>Changes saved.</output>}
       </div>
     </form>
   )
