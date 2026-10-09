@@ -22,8 +22,8 @@ proprietary fields — built with **Clean Architecture** and **TDD**.
 |---|---|---|---|
 | US01 Enumeration | Paginated list with sprite, category, mass (kg), skills (cached) | `GET /api/pokemon?page=0&size=20` (public) | _TBD_ |
 | US02 Detailed view | Official artwork, 6 core stats + total, English description, evolution tree with branches and conditions | `GET /api/pokemon/{id}` (public) | _TBD_ |
-| US03 Synchronization | Persist Pokémon locally + proprietary fields | _TBD_ | _TBD_ |
-| US04 Local modification | Validated update (400/404/409) | _TBD_ | _TBD_ |
+| US03 Synchronization | Idempotent replication into PostgreSQL; proprietary fields (localized name, region, habitat, tags, notes) survive re-syncs | `POST /api/local-pokemon` (signed in), `GET /api/local-pokemon[/{id}]` (public) | _TBD_ |
+| US04 Local modification | Replace proprietary data with optimistic locking; delete (ADMIN) | `PUT /api/local-pokemon/{id}` (signed in), `DELETE …/{id}` (ADMIN) | _TBD_ |
 
 ## Architecture
 _TBD — diagram + layer description. Decisions: [`docs/DECISIONS.md`](docs/DECISIONS.md)._
@@ -61,11 +61,22 @@ Interactive docs: http://localhost:8080/swagger-ui.html (OpenAPI JSON at `/v3/ap
 |---|---|---|---|
 | `GET /api/pokemon?page=0&size=20` | public | 200 page of summaries | 400 invalid paging, 502 PokeAPI unavailable |
 | `GET /api/pokemon/{id}` | public | 200 details with evolution tree | 400 invalid id, 404 unknown Pokémon, 502 PokeAPI unavailable |
+| `GET /api/local-pokemon?page=0&size=20` | public | 200 page of local Pokémon | 400 invalid paging |
+| `GET /api/local-pokemon/{id}` | public | 200 local Pokémon (`catalog` + `proprietary` + `version`) | 400, 404 |
+| `POST /api/local-pokemon` `{"pokeApiId":25}` | signed in | 201 + `Location` (created) / 200 (refreshed) | 400, 401, 404 unknown in PokeAPI, 409 concurrent sync, 502 |
+| `PUT /api/local-pokemon/{id}` `{"version":0, "localizedName", "region", "habitat", "tags", "notes"}` | signed in | 200 | 400 (per-field errors, unknown fields, malformed JSON), 401, 404, 409 stale version |
+| `DELETE /api/local-pokemon/{id}` | ADMIN | 204 | 401, 403, 404 |
 
 Paginated responses share one envelope: `{"items": [...], "page", "size", "totalElements", "totalPages"}`.
 Errors are RFC 9457 `application/problem+json` with `type` (`urn:pokemon-challenge:problem:*`), `title`, `status`,
 `detail`, `instance` and, for validation, `errors: [{"field", "message"}]`. Stack traces and internal messages are
 never returned.
+
+**Local replica (US03/US04).** A local Pokémon has two parts with different owners: `catalog` is copied from
+PokeAPI on every sync and is read-only through the API (sending `name` in a PUT is a 400 "not an editable field");
+`proprietary` is ours and survives re-syncs. Updates must carry the `version` that was read; a stale one is a 409
+(checked by the domain and again by the database via JPA `@Version`). The database starts with Pokémon #1–#12
+(Flyway seed generated from real PokeAPI data; proprietary values are demo data).
 
 **Caching and fan-out (US01).** PokeAPI's list endpoint returns only names, so a page of 20 needs 41 calls
 (list + 20 Pokémon + 20 species). They run in parallel on virtual threads, capped at 20 concurrent PokeAPI calls

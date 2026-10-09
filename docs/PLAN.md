@@ -38,8 +38,8 @@ Compose v5.5.1, git 2.56.0, identity `MarinoGNeto <marino.goncalvesneto@gmail.co
 ## 2. Friday — backend features
 - [x] US01 list with pagination + caching (unit + web slice + integration tests)
 - [x] US02 detail: stats, description, evolution chain (tree mapping tested with branching fixtures)
-- [ ] US03 sync/upsert + proprietary fields + Flyway migrations + seed
-- [ ] US04 update/patch/delete with validation (400/404/409) + ProblemDetail handler
+- [x] US03 sync/upsert + proprietary fields + Flyway migrations + seed
+- [x] US04 update/delete with validation (400/404/409) + ProblemDetail handler (PATCH cut, ADR-012)
 - [ ] Auth: register/login/JWT, public vs protected routes, seeded users
 - [ ] OpenAPI/Swagger UI reachable
 

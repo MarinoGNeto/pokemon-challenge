@@ -40,12 +40,14 @@ User stories must be explicitly addressed in the final presentation.
       — `GET /api/pokemon/{id}` (`GetPokemonDetails`, `PokemonDetailsResponse`, `GetPokemonDetailsIT` on Eevee)
 
 ### US03 — Data synchronization
-- [ ] Mechanism to **persist Pokemon data** into a **local relational store**
-- [ ] Replication supports **proprietary fields**: localized name, geographical metadata, internal classification tags
+- [x] Mechanism to **persist Pokemon data** into a **local relational store** — `POST /api/local-pokemon` (`SyncPokemon`, idempotent upsert), PostgreSQL + Flyway
+- [x] Replication supports **proprietary fields**: localized name, geographical metadata, internal classification tags — `ProprietaryData` (localized name, region, habitat, tags, notes), kept on re-sync
 
 ### US04 — Local data modification
-- [ ] **Update** any Pokemon stored locally
-- [ ] Robust validation: **404** for missing records, **400** for malformed payloads, plus extra defensive logic
+- [x] **Update** any Pokemon stored locally — `PUT /api/local-pokemon/{id}` (`UpdateLocalPokemon`)
+- [x] Robust validation: **404** for missing records, **400** for malformed payloads, plus extra defensive logic
+      — 409 stale version (optimistic locking, checked in domain and database), unknown/read-only fields rejected,
+      length/format rules with per-field errors, duplicate PokeAPI id → 409
       (e.g. 409 conflicts, field length/format limits, unknown fields, optimistic locking)
 
 ## Technical requirements
@@ -62,20 +64,19 @@ User stories must be explicitly addressed in the final presentation.
 
 ### Database
 - [ ] Relational DB with a **primary entity** (local Pokemon) and a **secondary collection for user management** (users)
-- [ ] Records have a **unique primary key** and **at least two descriptive attributes**
+- [x] Records have a **unique primary key** and **at least two descriptive attributes** — `pokemon.id` + many attributes (users table comes with auth)
 
 ### API
-- [ ] Java Web API with **full CRUD** for the dataset
-- [ ] Standard HTTP verbs, required parameters, **consistent return structures**
+- [x] Java Web API with **full CRUD** for the dataset — create = sync from PokeAPI, read, update, delete on `/api/local-pokemon`
+- [x] Standard HTTP verbs, required parameters, **consistent return structures** — one page envelope, one problem format
 - [ ] Auxiliary API for **user registration, authentication**, and **protected vs public routes**
 
 ### Data layer
-- [ ] Dedicated data access layer providing the foundation for controllers
+- [x] Dedicated data access layer providing the foundation for controllers — `adapters.out.persistence` behind `LocalPokemonRepository`
 
 ### Core business logic
-- [ ] Dedicated business layer with all domain rules and validation
-- [ ] **Independent** from both API and data access layers (enforced by ArchUnit)
-      _(Guard in place: `ArchitectureTest` + `ArchitectureRulesTest`; ticked once the business layer exists.)_
+- [x] Dedicated business layer with all domain rules and validation — `domain` + `application`
+- [x] **Independent** from both API and data access layers (enforced by ArchUnit: `ArchitectureTest`, `ArchitectureRulesTest`)
 
 ### Testing & validation
 - [ ] Thorough **unit test coverage** for every core component (+ integration tests; coverage report)

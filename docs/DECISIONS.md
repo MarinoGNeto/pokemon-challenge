@@ -83,6 +83,10 @@ Table `pokemon` (local replica): `id` (PK, surrogate), `pokeapi_id` (unique), `n
 - CRUD: **Create = sync/import from PokeAPI** (`POST`) — stated explicitly in the presentation as the
   interpretation of "full CRUD"; `GET` list/detail, `PUT` (full update of editable fields), `DELETE`.
   `PATCH` is on the cut list. Editable fields are whitelisted; PokeAPI-owned fields are read-only via API.
+- *As implemented (US03/US04):* responses nest `catalog` (read-only) and `proprietary` (editable) so the ownership
+  is visible; unknown request fields are rejected (`fail-on-unknown-properties`), which is how read-only fields are
+  enforced, while PokeAPI DTOs are explicit tolerant readers; sync answers 201 (created) or 200 (refreshed); a
+  duplicate PokeAPI id (concurrent first sync) is a 409. Seed (ADR-011) is Flyway `V2`.
 
 ## ADR-008 — Users & security: stateless JWT
 **Status:** Accepted
