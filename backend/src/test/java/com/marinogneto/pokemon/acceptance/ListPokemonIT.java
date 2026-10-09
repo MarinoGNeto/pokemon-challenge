@@ -19,10 +19,12 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -54,8 +56,16 @@ class ListPokemonIT {
     @LocalServerPort
     private int port;
 
-    @BeforeAll
-    static void stubPokeApi() {
+    @Autowired
+    private CacheManager cacheManager;
+
+    /**
+     * WireMockExtension resets stubs and the request journal before every test, so stubs are registered per test.
+     * The application's cache outlives a test, so it is cleared too: each test starts cold.
+     */
+    @BeforeEach
+    void stubPokeApiAndClearCaches() {
+        cacheManager.getCacheNames().forEach(name -> cacheManager.getCache(name).clear());
         pokeApi.stubFor(get(urlPathEqualTo("/api/v2/pokemon"))
                 .withQueryParam("offset", equalTo("0")).withQueryParam("limit", equalTo("3"))
                 .willReturn(okJson(fixture("pokemon-list-offset-0-limit-3.json"))));
