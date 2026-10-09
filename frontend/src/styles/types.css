@@ -1,0 +1,20 @@
+/* Pokémon type colours: background + a text colour chosen for >= 4.5:1 contrast. */
+.type-normal { --type-bg: #a8a77a; --type-ink: #18212f; }
+.type-fire { --type-bg: #e2672e; --type-ink: #18212f; }
+.type-water { --type-bg: #4f86e8; --type-ink: #18212f; }
+.type-electric { --type-bg: #f2c335; --type-ink: #18212f; }
+.type-grass { --type-bg: #5fae46; --type-ink: #18212f; }
+.type-ice { --type-bg: #7fd0cc; --type-ink: #18212f; }
+.type-fighting { --type-bg: #b5352c; --type-ink: #ffffff; }
+.type-poison { --type-bg: #8e3d96; --type-ink: #ffffff; }
+.type-ground { --type-bg: #d8b55e; --type-ink: #18212f; }
+.type-flying { --type-bg: #9b8be8; --type-ink: #18212f; }
+.type-psychic { --type-bg: #e8557e; --type-ink: #18212f; }
+.type-bug { --type-bg: #9fb122; --type-ink: #18212f; }
+.type-rock { --type-bg: #b39c3f; --type-ink: #18212f; }
+.type-ghost { --type-bg: #5d4b8a; --type-ink: #ffffff; }
+.type-dragon { --type-bg: #5a3bd6; --type-ink: #ffffff; }
+.type-dark { --type-bg: #5a4a40; --type-ink: #ffffff; }
+.type-steel { --type-bg: #a6a6c4; --type-ink: #18212f; }
+.type-fairy { --type-bg: #e594b4; --type-ink: #18212f; }
+.type-unknown { --type-bg: #c7ccd4; --type-ink: #18212f; }

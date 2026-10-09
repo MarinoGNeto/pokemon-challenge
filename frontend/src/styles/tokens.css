@@ -1,0 +1,42 @@
+/*
+ * Design tokens — "field device readout".
+ * One brand red, used only for the mark and primary actions. Pokémon type colours (types.css) are the only
+ * other colour, and they always carry information.
+ */
+:root {
+  --color-bg: #eef2f6;
+  --color-surface: #ffffff;
+  --color-ink: #18212f;
+  --color-ink-muted: #5b6676;
+  --color-line: #d5dce5;
+  --color-brand: #c8102e;
+  --color-brand-ink: #ffffff;
+  --color-focus: #1f6feb;
+  --color-danger: #b42318;
+  --color-bar: #18212f;
+  --color-bar-track: #e3e8ef;
+
+  --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --font-body: 'Atkinson Hyperlegible', system-ui, sans-serif;
+
+  /* Type scale (1.25) */
+  --text-xs: 0.8rem;
+  --text-sm: 0.9rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.563rem;
+  --text-2xl: 1.953rem;
+  --text-3xl: 2.441rem;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --content-width: 72rem;
+}
