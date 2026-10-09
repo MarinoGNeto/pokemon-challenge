@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -72,53 +73,63 @@ public class PokeApiCatalog implements PokemonCatalog {
     @Override
     @Cacheable(CACHE_PAGES)
     public CatalogPage listPokemon(int offset, int limit) {
-        PokemonList list = fetch("Pokemon list", 0,
+        // No "not found" here: a 404 on a list is PokeAPI misbehaving, so it falls through to "unavailable".
+        PokemonList list = fetch("Pokemon list (offset " + offset + ")",
                 uri -> uri.path("/pokemon").queryParam("offset", offset).queryParam("limit", limit).build(),
-                PokemonList.class);
+                PokemonList.class, null);
         return PokeApiMapper.toPage(list);
     }
 
     @Override
     @Cacheable(CACHE_POKEMON)
     public Pokemon getPokemon(int id) {
-        return PokeApiMapper.toPokemon(fetch("Pokemon", id,
-                uri -> uri.path("/pokemon/{id}").build(id), PokemonResponse.class));
+        return PokeApiMapper.toPokemon(fetchById("Pokemon", id, "/pokemon/{id}", PokemonResponse.class));
     }
 
     @Override
     @Cacheable(CACHE_SPECIES)
     public Species getSpecies(int id) {
-        return PokeApiMapper.toSpecies(fetch("Pokemon species", id,
-                uri -> uri.path("/pokemon-species/{id}").build(id), SpeciesResponse.class));
+        return PokeApiMapper.toSpecies(fetchById("Pokemon species", id, "/pokemon-species/{id}", SpeciesResponse.class));
     }
 
     @Override
     @Cacheable(CACHE_EVOLUTION_CHAINS)
     public EvolutionChain getEvolutionChain(int id) {
-        return PokeApiMapper.toEvolutionChain(fetch("Evolution chain", id,
-                uri -> uri.path("/evolution-chain/{id}").build(id), EvolutionChainResponse.class));
+        return PokeApiMapper.toEvolutionChain(
+                fetchById("Evolution chain", id, "/evolution-chain/{id}", EvolutionChainResponse.class));
     }
 
-    private <T> T fetch(String resource, int id, Function<UriBuilder, URI> uri, Class<T> type) {
+    /** A single resource by id: here, and only here, a 404 means the requested thing does not exist. */
+    private <T> T fetchById(String resource, int id, String path, Class<T> type) {
+        return fetch(resource + " " + id, uri -> uri.path(path).build(id), type,
+                () -> new PokemonNotFoundException(resource, id));
+    }
+
+    /**
+     * @param notFound what a 404 means for this request, or {@code null} when a 404 can only be an upstream error
+     */
+    private <T> T fetch(String description, Function<UriBuilder, URI> uri, Class<T> type,
+                        Supplier<? extends RuntimeException> notFound) {
         try {
             T body = http.get()
                     .uri(uri)
                     .retrieve()
-                    .onStatus(status -> status.isSameCodeAs(HttpStatus.NOT_FOUND), (request, response) -> {
-                        throw new PokemonNotFoundException(resource, id);
-                    })
+                    .onStatus(status -> notFound != null && status.isSameCodeAs(HttpStatus.NOT_FOUND),
+                            (request, response) -> {
+                                throw notFound.get();
+                            })
                     .onStatus(HttpStatusCode::isError, (request, response) -> {
                         throw new CatalogUnavailableException(
                                 "PokeAPI answered " + response.getStatusCode().value() + " for " + request.getURI());
                     })
                     .body(type);
             if (body == null) {
-                throw new CatalogUnavailableException("PokeAPI returned an empty body for " + resource + " " + id);
+                throw new CatalogUnavailableException("PokeAPI returned an empty body for " + description);
             }
             return body;
         } catch (RestClientException e) {
             // Timeouts, connection failures and unreadable JSON all mean: the catalogue is not usable right now.
-            throw new CatalogUnavailableException("PokeAPI request failed for " + resource + " " + id, e);
+            throw new CatalogUnavailableException("PokeAPI request failed for " + description, e);
         }
     }
 }
