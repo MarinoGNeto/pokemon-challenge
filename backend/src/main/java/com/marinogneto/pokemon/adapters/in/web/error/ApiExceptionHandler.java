@@ -1,7 +1,7 @@
 package com.marinogneto.pokemon.adapters.in.web.error;
 
 import com.marinogneto.pokemon.application.port.out.CatalogUnavailableException;
-import com.marinogneto.pokemon.domain.localpokemon.InvalidLocalPokemonException;
+import com.marinogneto.pokemon.domain.DomainValidationException;
 import com.marinogneto.pokemon.domain.localpokemon.LocalPokemonNotFoundException;
 import com.marinogneto.pokemon.domain.localpokemon.VersionConflictException;
 import com.marinogneto.pokemon.domain.pokemon.PokemonNotFoundException;
@@ -55,9 +55,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 e.getMessage() + ". Reload it and apply your change again.");
     }
 
-    /** A domain rule on proprietary data (e.g. tag format). */
-    @ExceptionHandler(InvalidLocalPokemonException.class)
-    ProblemDetail invalidLocalPokemon(InvalidLocalPokemonException e) {
+    /** A domain rule on a field (e.g. tag format, username format). */
+    @ExceptionHandler(DomainValidationException.class)
+    ProblemDetail domainValidation(DomainValidationException e) {
         ProblemDetail body = invalidRequest("The request breaks a validation rule.");
         body.setProperty("errors", List.of(new FieldError(e.field(), e.reason())));
         return body;
