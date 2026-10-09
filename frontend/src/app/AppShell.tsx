@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router'
+import { NavLink, Outlet, ScrollRestoration } from 'react-router'
 import styles from './AppShell.module.css'
 
 export function AppShell() {
@@ -31,6 +31,8 @@ export function AppShell() {
       <main id="main" className={styles.main}>
         <Outlet />
       </main>
+      {/* New pages start at the top; Back returns to where you were in the list. */}
+      <ScrollRestoration />
       <footer className={styles.footer}>
         Pokémon data from{' '}
         <a href="https://pokeapi.co" rel="noreferrer" target="_blank">

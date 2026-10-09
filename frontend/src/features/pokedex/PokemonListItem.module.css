@@ -98,13 +98,3 @@
   color: var(--color-ink-muted);
   font-size: var(--text-xs);
 }
-
-@media (min-width: 40rem) {
-  .link {
-    grid-template-columns: 1fr;
-  }
-
-  .sprite {
-    width: 6rem;
-  }
-}

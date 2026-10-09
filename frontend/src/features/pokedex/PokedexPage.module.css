@@ -42,11 +42,6 @@
   }
 }
 
-@media (min-width: 76rem) {
-  .grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
 
 .empty {
   color: var(--color-ink-muted);

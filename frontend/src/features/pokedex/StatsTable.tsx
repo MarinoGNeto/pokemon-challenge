@@ -23,7 +23,9 @@ export function StatsTable({ stats }: { stats: Stats }) {
             <th scope="row">{label}</th>
             <td className={styles.value}>{stats[key]}</td>
             <td className={styles.barCell} aria-hidden="true">
-              <span className={styles.bar} style={{ inlineSize: `${(stats[key] / MAX_STAT) * 100}%` }} />
+              <span className={styles.track}>
+                <span className={styles.bar} style={{ inlineSize: `${(stats[key] / MAX_STAT) * 100}%` }} />
+              </span>
             </td>
           </tr>
         ))}
