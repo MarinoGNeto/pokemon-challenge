@@ -53,8 +53,9 @@ class HealthEndpointIT {
     }
 
     @Test
-    void anyOtherRouteRequiresAuthentication() throws Exception {
-        assertThat(get("/api/local-pokemon").statusCode()).isEqualTo(401);
+    void anyRouteNotDeclaredPublicRequiresAuthentication() throws Exception {
+        // Reading /api/local-pokemon became public with US03 (ADR-008); undeclared routes stay protected.
+        assertThat(get("/api/not-declared-public").statusCode()).isEqualTo(401);
     }
 
     private HttpResponse<String> get(String path) throws IOException, InterruptedException {

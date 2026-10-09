@@ -1,6 +1,9 @@
 package com.marinogneto.pokemon.adapters.in.web.error;
 
 import com.marinogneto.pokemon.application.port.out.CatalogUnavailableException;
+import com.marinogneto.pokemon.domain.localpokemon.InvalidLocalPokemonException;
+import com.marinogneto.pokemon.domain.localpokemon.LocalPokemonNotFoundException;
+import com.marinogneto.pokemon.domain.localpokemon.VersionConflictException;
 import com.marinogneto.pokemon.domain.pokemon.PokemonNotFoundException;
 import java.net.URI;
 import java.util.List;
@@ -12,11 +15,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.validation.method.ParameterErrors;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import tools.jackson.databind.exc.UnrecognizedPropertyException;
 
 /**
  * Single place that turns exceptions into RFC 9457 {@code application/problem+json} responses (ADR-010).
@@ -37,6 +44,25 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return problem(HttpStatus.NOT_FOUND, "not-found", "Pokémon not found", e.getMessage());
     }
 
+    @ExceptionHandler(LocalPokemonNotFoundException.class)
+    ProblemDetail localNotFound(LocalPokemonNotFoundException e) {
+        return problem(HttpStatus.NOT_FOUND, "not-found", "Local Pokémon not found", e.getMessage());
+    }
+
+    @ExceptionHandler(VersionConflictException.class)
+    ProblemDetail versionConflict(VersionConflictException e) {
+        return problem(HttpStatus.CONFLICT, "conflict", "Edit conflict",
+                e.getMessage() + ". Reload it and apply your change again.");
+    }
+
+    /** A domain rule on proprietary data (e.g. tag format). */
+    @ExceptionHandler(InvalidLocalPokemonException.class)
+    ProblemDetail invalidLocalPokemon(InvalidLocalPokemonException e) {
+        ProblemDetail body = invalidRequest("The request breaks a validation rule.");
+        body.setProperty("errors", List.of(new FieldError(e.field(), e.reason())));
+        return body;
+    }
+
     @ExceptionHandler(CatalogUnavailableException.class)
     ProblemDetail catalogUnavailable(CatalogUnavailableException e) {
         log.warn("Pokémon catalogue unavailable: {}", e.getMessage(), e);
@@ -55,14 +81,48 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleHandlerMethodValidationException(HandlerMethodValidationException ex,
             HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        // A @Valid request body validated together with constrained parameters arrives as ParameterErrors:
+        // report its individual fields ("version"), not the parameter name ("request").
         List<FieldError> errors = ex.getParameterValidationResults().stream()
-                .flatMap(result -> result.getResolvableErrors().stream()
-                        .map(error -> new FieldError(result.getMethodParameter().getParameterName(),
-                                error.getDefaultMessage())))
+                .flatMap(result -> result instanceof ParameterErrors bodyErrors
+                        ? bodyErrors.getFieldErrors().stream()
+                                .map(error -> new FieldError(error.getField(), error.getDefaultMessage()))
+                        : result.getResolvableErrors().stream()
+                                .map(error -> new FieldError(result.getMethodParameter().getParameterName(),
+                                        error.getDefaultMessage())))
                 .toList();
         ProblemDetail body = invalidRequest("One or more parameters are invalid.");
         body.setProperty("errors", errors);
         return ResponseEntity.badRequest().body(body);
+    }
+
+    /** Bean Validation on a request body (e.g. missing {@code version}). */
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        List<FieldError> errors = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> new FieldError(error.getField(), error.getDefaultMessage()))
+                .toList();
+        ProblemDetail body = invalidRequest("One or more fields are invalid.");
+        body.setProperty("errors", errors);
+        return ResponseEntity.badRequest().body(body);
+    }
+
+    /**
+     * Unreadable body: malformed JSON, a wrong type, or an unknown field. Unknown fields are rejected on purpose
+     * (spring.jackson.deserialization.fail-on-unknown-properties): a client sending "name" in an update must
+     * learn that catalogue fields are read-only instead of being silently ignored.
+     */
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        if (ex.getMostSpecificCause() instanceof UnrecognizedPropertyException unknown) {
+            ProblemDetail body = invalidRequest("Field '" + unknown.getPropertyName() + "' cannot be set.");
+            body.setProperty("errors",
+                    List.of(new FieldError(unknown.getPropertyName(), "is not an editable field")));
+            return ResponseEntity.badRequest().body(body);
+        }
+        return ResponseEntity.badRequest().body(invalidRequest("The request body is not valid JSON for this endpoint."));
     }
 
     /** A parameter that cannot be converted (e.g. {@code page=abc}). */
