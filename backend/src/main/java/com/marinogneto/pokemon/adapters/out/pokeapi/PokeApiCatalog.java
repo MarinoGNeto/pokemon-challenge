@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.function.Function;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -29,8 +30,16 @@ import org.springframework.web.util.UriBuilder;
  *
  * <p>Error translation: 404 → {@link PokemonNotFoundException}; any other error status, timeout, I/O failure or
  * unreadable body → {@link CatalogUnavailableException}. Nothing Spring- or HTTP-specific leaks to the caller.
+ *
+ * <p>Successful responses are cached per resource (ADR-005); the cache manager is configured in infrastructure.
+ * Failures are not cached.
  */
 public class PokeApiCatalog implements PokemonCatalog {
+
+    public static final String CACHE_PAGES = "pokeapi-pages";
+    public static final String CACHE_POKEMON = "pokeapi-pokemon";
+    public static final String CACHE_SPECIES = "pokeapi-species";
+    public static final String CACHE_EVOLUTION_CHAINS = "pokeapi-evolution-chains";
 
     private static final String USER_AGENT = "pokemon-challenge (+https://github.com/MarinoGNeto/pokemon-challenge)";
 
@@ -61,6 +70,7 @@ public class PokeApiCatalog implements PokemonCatalog {
     }
 
     @Override
+    @Cacheable(CACHE_PAGES)
     public CatalogPage listPokemon(int offset, int limit) {
         PokemonList list = fetch("Pokemon list", 0,
                 uri -> uri.path("/pokemon").queryParam("offset", offset).queryParam("limit", limit).build(),
@@ -69,18 +79,21 @@ public class PokeApiCatalog implements PokemonCatalog {
     }
 
     @Override
+    @Cacheable(CACHE_POKEMON)
     public Pokemon getPokemon(int id) {
         return PokeApiMapper.toPokemon(fetch("Pokemon", id,
                 uri -> uri.path("/pokemon/{id}").build(id), PokemonResponse.class));
     }
 
     @Override
+    @Cacheable(CACHE_SPECIES)
     public Species getSpecies(int id) {
         return PokeApiMapper.toSpecies(fetch("Pokemon species", id,
                 uri -> uri.path("/pokemon-species/{id}").build(id), SpeciesResponse.class));
     }
 
     @Override
+    @Cacheable(CACHE_EVOLUTION_CHAINS)
     public EvolutionChain getEvolutionChain(int id) {
         return PokeApiMapper.toEvolutionChain(fetch("Evolution chain", id,
                 uri -> uri.path("/evolution-chain/{id}").build(id), EvolutionChainResponse.class));
