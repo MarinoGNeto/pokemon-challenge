@@ -20,14 +20,13 @@ User stories must be explicitly addressed in the final presentation.
 ## Functional requirements (user stories)
 
 ### PokeAPI integration
-- [ ] REST API with Spring Boot that talks to the external PokeAPI
-      _(Client done: `PokeApiCatalog` behind the `PokemonCatalog` port, WireMock-tested with real fixtures;
-      REST endpoints come with US01/US02.)_
+- [x] REST API with Spring Boot that talks to the external PokeAPI — `PokeApiCatalog` behind the
+      `PokemonCatalog` port; first endpoint `GET /api/pokemon` (US01)
 
 ### US01 — Pokemon enumeration
-- [ ] Browse Pokemon with **pagination**
-- [ ] Each entry shows **sprite**, **category**, **mass (weight)**, **skills (abilities)**
-- [ ] *Nice to have:* **cache** service responses
+- [x] Browse Pokemon with **pagination** — `GET /api/pokemon?page=&size=` (`ListPokemon`, `PokemonCatalogController`)
+- [x] Each entry shows **sprite**, **category**, **mass (weight)**, **skills (abilities)** — `PokemonSummaryResponse` (`weightKg`, abilities with `hidden`)
+- [x] *Nice to have:* **cache** service responses — Caffeine, 24 h, per PokeAPI resource (`PokeApiCachingTest`)
 
 > Interpretation (see DECISIONS.md): *category* = species `genera` (e.g. "Seed Pokémon", English);
 > *mass* = `weight` (hectograms → returned as kg); *skills* = `abilities` (moves optional/limited).
@@ -54,7 +53,7 @@ User stories must be explicitly addressed in the final presentation.
 - [x] Public Git repository — https://github.com/MarinoGNeto/pokemon-challenge
 - [ ] Tests included
 - [ ] Proper error handling
-- [ ] *Nice to have:* caching layer for PokeAPI responses
+- [x] *Nice to have:* caching layer for PokeAPI responses — see US01
 - [ ] Front-end that consumes the API
 
 ### Optional

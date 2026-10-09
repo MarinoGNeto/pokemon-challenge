@@ -98,3 +98,24 @@ model through [`CLAUDE.md`](../CLAUDE.md) (constraints, architecture rules, TDD,
     the timeout test fast).
 - How validated: 35 unit + 5 integration tests green (twice); a throwaway live check against pokeapi.co mapped
   Pikachu, Eevee's species and its 8-branch chain, and turned an unknown id into `PokemonNotFoundException`.
+
+### 2026-10-09 15:45 — US01: paginated list, cache, error contract
+- Goal: `GET /api/pokemon` with sprite, category, mass and skills; caching; ProblemDetail errors; public route.
+- Prompt (summary): "Continue with PLAN §2" (US01), strictly TDD.
+- Output accepted: `ListPokemon` use case (page→offset, parallel fetch on an injected `Executor`, shared `Page`
+  envelope); Caffeine `@Cacheable` per PokeAPI resource; controller with bean-validated paging; one
+  `@RestControllerAdvice` (400 with `errors[]`, 502, 500 that leaks nothing); stateless `SecurityFilterChain`
+  making catalogue reads public; WireMock-backed end-to-end test.
+- Rejected / corrected (and why):
+  - Parallelism is *proved*, not assumed: the test's fake catalogue makes the three fetches wait for each other
+    on a latch, so a sequential implementation deadlocks and fails (checked by mutation).
+  - The executor was deliberately **not** made a Spring bean: an `Executor` bean silently disables Boot's default
+    task executor. The concurrency cap is global (20 PokeAPI calls across all users), stricter than "per page".
+  - The cache test runs the real infrastructure wiring in a small Spring context, so it proves the proxy applies,
+    not just that annotations are present.
+  - The end-to-end test found a **real bug** the slice tests could not: a 404 on PokeAPI's *list* endpoint became
+    "Pokemon list 0 not found" (→ 500). A list cannot be "not found"; fixed test-first so only id lookups map 404
+    to not-found. It also found a bug in the test itself (WireMock resets stubs before each test, so `@BeforeAll`
+    stubs vanished) — the AI read the actual exception before changing anything.
+- How validated: 53 unit + 9 integration tests; merged coverage 97% instructions / 75% branches; live run of the
+  jar against the real PokeAPI: first page 1.2 s, cached 12 ms; Swagger UI and the 400 problem checked by hand.

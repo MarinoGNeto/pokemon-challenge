@@ -20,7 +20,7 @@ proprietary fields — built with **Clean Architecture** and **TDD**.
 ## User stories → implementation
 | Story | What it does | Endpoint(s) | Frontend |
 |---|---|---|---|
-| US01 Enumeration | Paginated list with sprite, category, mass, skills (cached) | _TBD_ | _TBD_ |
+| US01 Enumeration | Paginated list with sprite, category, mass (kg), skills (cached) | `GET /api/pokemon?page=0&size=20` (public) | _TBD_ |
 | US02 Detailed view | Image, stats, description, evolution chain | _TBD_ | _TBD_ |
 | US03 Synchronization | Persist Pokémon locally + proprietary fields | _TBD_ | _TBD_ |
 | US04 Local modification | Validated update (400/404/409) | _TBD_ | _TBD_ |
@@ -55,7 +55,21 @@ PostgreSQL (`TestPokemonApiApplication`).
 _TBD (demo-only, seeded by Flyway)._
 
 ## API
-_TBD — table of endpoints, auth requirements and status codes._
+Interactive docs: http://localhost:8080/swagger-ui.html (OpenAPI JSON at `/v3/api-docs`).
+
+| Method & path | Auth | Success | Errors |
+|---|---|---|---|
+| `GET /api/pokemon?page=0&size=20` | public | 200 page of summaries | 400 invalid paging, 502 PokeAPI unavailable |
+
+Paginated responses share one envelope: `{"items": [...], "page", "size", "totalElements", "totalPages"}`.
+Errors are RFC 9457 `application/problem+json` with `type` (`urn:pokemon-challenge:problem:*`), `title`, `status`,
+`detail`, `instance` and, for validation, `errors: [{"field", "message"}]`. Stack traces and internal messages are
+never returned.
+
+**Caching and fan-out (US01).** PokeAPI's list endpoint returns only names, so a page of 20 needs 41 calls
+(list + 20 Pokémon + 20 species). They run in parallel on virtual threads, capped at 20 concurrent PokeAPI calls
+across all users, and every response is cached for 24 h (Caffeine). Measured against the live PokeAPI:
+first page **1.2 s**, same page again **12 ms**.
 
 ## Testing
 | Command (in `backend/`) | Runs | Needs Docker |
