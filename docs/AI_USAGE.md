@@ -133,6 +133,19 @@ model through [`CLAUDE.md`](../CLAUDE.md) (constraints, architecture rules, TDD,
     PokeAPI's CDN layout in our API.
   - Noticed in the live check: Espeon/Umbreon evolve by happiness + time of day, which the current
     `EvolutionCondition` (trigger, level, item) does not carry, so they show only "level-up". Recorded as a known
-    limitation rather than silently widening scope.
+    limitation rather than silently widening scope. → fixed right after, see next entry.
 - How validated: 61 unit + 11 integration tests; live run against PokeAPI (Eevee 1.17 s cold; Mega Venusaur 0.27 s
   thanks to the cached chain; `id=0` → 400 problem).
+
+### 2026-10-09 16:10 — Evolution conditions: friendship, time of day, default entry
+- Goal: Eevee is the main demo case; Espeon/Umbreon must show their real condition. Small and test-first.
+- Prompt (summary): "Fix the friendship/time-of-day evolution conditions now, keep it small and test-first."
+- Output accepted: `EvolutionCondition` + `minHappiness`, `timeOfDay`, `knownMoveType`; mapper picks the
+  `is_default` evolution detail.
+- Rejected / corrected (and why): before writing the test, the AI dumped every Eevee branch from the *raw*
+  capture instead of patching only Espeon/Umbreon. That showed a deeper bug: PokeAPI lists one way to evolve per
+  game generation and flags the canonical one with `is_default`; the mapper took the first entry, so Leafeon and
+  Glaceon showed an old location rule instead of Leaf/Ice Stone. The trimmed fixture had hidden it by keeping only
+  the first entry — fixtures now keep every entry.
+- How validated: red tests for Espeon, Umbreon, Sylveon, Leafeon, Glaceon; Eevee end-to-end test extended;
+  63 unit + 11 integration tests green.
