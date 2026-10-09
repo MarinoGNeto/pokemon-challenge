@@ -1,7 +1,10 @@
-# One-command local environment. Today: PostgreSQL. The backend and frontend services are added with
-# their Dockerfiles (PLAN §3).
+# One-command environment: `docker compose up --build`, then open http://localhost:3000.
 #
-# Values come from .env (copy .env.example). The fallbacks below are DEMO-ONLY so a fresh clone still starts.
+#   frontend (nginx :3000) --/api--> backend (Spring Boot :8080) --> postgres (:5432)
+#                                                 \--> PokeAPI (internet)
+#
+# Values come from an optional .env (copy .env.example). The fallbacks below are DEMO-ONLY, so a fresh clone
+# starts without any setup. Each service waits for the previous one to be healthy.
 name: pokemon-challenge
 
 services:
@@ -13,7 +16,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-pokemon}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pokemon}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      # Published on localhost only, for running the backend outside Docker (`./mvnw spring-boot:run`).
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -21,6 +25,35 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Built from the POSTGRES_* values on purpose: DB_URL in .env points at localhost for running outside Docker.
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-pokemon}
+      DB_USERNAME: ${POSTGRES_USER:-pokemon}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-pokemon}
+      # Empty = random signing key per start (ADR-008); set one in .env to keep tokens across restarts.
+      JWT_SECRET: ${JWT_SECRET:-}
+      JWT_TTL: ${JWT_TTL:-1h}
+    ports:
+      # API and Swagger UI (http://localhost:8080/swagger-ui.html) for the reviewer.
+      - "${BACKEND_PORT:-8080}:8080"
+    # Health check: see backend/Dockerfile (/actuator/health, includes the database).
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-3000}:8080"
+    # Health check: see frontend/Dockerfile.
 
 volumes:
   postgres-data:
