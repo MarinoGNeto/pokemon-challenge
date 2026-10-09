@@ -17,5 +17,6 @@ Trimming rules:
   purpose (unused) to prove unknown fields are ignored.
 - `pokemon-species`: kept the first and the last English flavor text and one non-English entry (to test the
   language filter and the "latest version" rule); `genera` reduced to `en` + `ja`.
-- `evolution-chain`: kept only the first `evolution_details` entry per link, with `trigger`, `min_level`,
-  `item` and a few unused fields.
+- `evolution-chain`: kept **every** `evolution_details` entry per link (one per game generation), with
+  `is_default`, `trigger`, `min_level`, `item`, `min_happiness`, `time_of_day`, `known_move_type` and `location`
+  (unused). Keeping only the first entry once hid a bug: the canonical entry is the one with `is_default: true`.

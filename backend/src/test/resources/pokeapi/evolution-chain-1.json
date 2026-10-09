@@ -6,12 +6,14 @@
       {
         "evolution_details": [
           {
+            "is_default": true,
             "item": null,
             "trigger": {
               "name": "level-up",
               "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
             },
             "known_move_type": null,
+            "location": null,
             "min_level": 16,
             "min_happiness": null,
             "time_of_day": ""
@@ -21,12 +23,14 @@
           {
             "evolution_details": [
               {
+                "is_default": true,
                 "item": null,
                 "trigger": {
                   "name": "level-up",
                   "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
                 "known_move_type": null,
+                "location": null,
                 "min_level": 32,
                 "min_happiness": null,
                 "time_of_day": ""

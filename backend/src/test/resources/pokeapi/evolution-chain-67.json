@@ -6,6 +6,7 @@
       {
         "evolution_details": [
           {
+            "is_default": true,
             "item": {
               "name": "water-stone",
               "url": "https://pokeapi.co/api/v2/item/84/"
@@ -15,6 +16,7 @@
               "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
             },
             "known_move_type": null,
+            "location": null,
             "min_level": null,
             "min_happiness": null,
             "time_of_day": ""
@@ -30,6 +32,7 @@
       {
         "evolution_details": [
           {
+            "is_default": true,
             "item": {
               "name": "thunder-stone",
               "url": "https://pokeapi.co/api/v2/item/83/"
@@ -39,6 +42,7 @@
               "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
             },
             "known_move_type": null,
+            "location": null,
             "min_level": null,
             "min_happiness": null,
             "time_of_day": ""
@@ -54,6 +58,7 @@
       {
         "evolution_details": [
           {
+            "is_default": true,
             "item": {
               "name": "fire-stone",
               "url": "https://pokeapi.co/api/v2/item/82/"
@@ -63,6 +68,7 @@
               "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
             },
             "known_move_type": null,
+            "location": null,
             "min_level": null,
             "min_happiness": null,
             "time_of_day": ""
@@ -78,12 +84,14 @@
       {
         "evolution_details": [
           {
+            "is_default": true,
             "item": null,
             "trigger": {
               "name": "level-up",
               "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
             },
             "known_move_type": null,
+            "location": null,
             "min_level": null,
             "min_happiness": 160,
             "time_of_day": "day"
@@ -99,12 +107,14 @@
       {
         "evolution_details": [
           {
+            "is_default": true,
             "item": null,
             "trigger": {
               "name": "level-up",
               "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
             },
             "known_move_type": null,
+            "location": null,
             "min_level": null,
             "min_happiness": 160,
             "time_of_day": "night"
@@ -120,12 +130,97 @@
       {
         "evolution_details": [
           {
+            "is_default": false,
             "item": null,
             "trigger": {
               "name": "level-up",
               "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
             },
             "known_move_type": null,
+            "location": {
+              "name": "eterna-forest",
+              "url": "https://pokeapi.co/api/v2/location/8/"
+            },
+            "min_level": null,
+            "min_happiness": null,
+            "time_of_day": ""
+          },
+          {
+            "is_default": false,
+            "item": null,
+            "trigger": {
+              "name": "level-up",
+              "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+            },
+            "known_move_type": null,
+            "location": {
+              "name": "pinwheel-forest",
+              "url": "https://pokeapi.co/api/v2/location/375/"
+            },
+            "min_level": null,
+            "min_happiness": null,
+            "time_of_day": ""
+          },
+          {
+            "is_default": false,
+            "item": null,
+            "trigger": {
+              "name": "level-up",
+              "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+            },
+            "known_move_type": null,
+            "location": {
+              "name": "kalos-route-20",
+              "url": "https://pokeapi.co/api/v2/location/650/"
+            },
+            "min_level": null,
+            "min_happiness": null,
+            "time_of_day": ""
+          },
+          {
+            "is_default": true,
+            "item": {
+              "name": "leaf-stone",
+              "url": "https://pokeapi.co/api/v2/item/85/"
+            },
+            "trigger": {
+              "name": "use-item",
+              "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+            },
+            "known_move_type": null,
+            "location": null,
+            "min_level": null,
+            "min_happiness": null,
+            "time_of_day": ""
+          },
+          {
+            "is_default": false,
+            "item": null,
+            "trigger": {
+              "name": "level-up",
+              "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+            },
+            "known_move_type": null,
+            "location": {
+              "name": "petalburg-woods",
+              "url": "https://pokeapi.co/api/v2/location/438/"
+            },
+            "min_level": null,
+            "min_happiness": null,
+            "time_of_day": ""
+          },
+          {
+            "is_default": false,
+            "item": null,
+            "trigger": {
+              "name": "level-up",
+              "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+            },
+            "known_move_type": null,
+            "location": {
+              "name": "lush-jungle",
+              "url": "https://pokeapi.co/api/v2/location/750/"
+            },
             "min_level": null,
             "min_happiness": null,
             "time_of_day": ""
@@ -141,12 +236,97 @@
       {
         "evolution_details": [
           {
+            "is_default": false,
             "item": null,
             "trigger": {
               "name": "level-up",
               "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
             },
             "known_move_type": null,
+            "location": {
+              "name": "sinnoh-route-217",
+              "url": "https://pokeapi.co/api/v2/location/48/"
+            },
+            "min_level": null,
+            "min_happiness": null,
+            "time_of_day": ""
+          },
+          {
+            "is_default": false,
+            "item": null,
+            "trigger": {
+              "name": "level-up",
+              "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+            },
+            "known_move_type": null,
+            "location": {
+              "name": "twist-mountain",
+              "url": "https://pokeapi.co/api/v2/location/380/"
+            },
+            "min_level": null,
+            "min_happiness": null,
+            "time_of_day": ""
+          },
+          {
+            "is_default": false,
+            "item": null,
+            "trigger": {
+              "name": "level-up",
+              "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+            },
+            "known_move_type": null,
+            "location": {
+              "name": "frost-cavern",
+              "url": "https://pokeapi.co/api/v2/location/640/"
+            },
+            "min_level": null,
+            "min_happiness": null,
+            "time_of_day": ""
+          },
+          {
+            "is_default": true,
+            "item": {
+              "name": "ice-stone",
+              "url": "https://pokeapi.co/api/v2/item/885/"
+            },
+            "trigger": {
+              "name": "use-item",
+              "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+            },
+            "known_move_type": null,
+            "location": null,
+            "min_level": null,
+            "min_happiness": null,
+            "time_of_day": ""
+          },
+          {
+            "is_default": false,
+            "item": null,
+            "trigger": {
+              "name": "level-up",
+              "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+            },
+            "known_move_type": null,
+            "location": {
+              "name": "shoal-cave",
+              "url": "https://pokeapi.co/api/v2/location/445/"
+            },
+            "min_level": null,
+            "min_happiness": null,
+            "time_of_day": ""
+          },
+          {
+            "is_default": false,
+            "item": null,
+            "trigger": {
+              "name": "level-up",
+              "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+            },
+            "known_move_type": null,
+            "location": {
+              "name": "mount-lanakila",
+              "url": "https://pokeapi.co/api/v2/location/775/"
+            },
             "min_level": null,
             "min_happiness": null,
             "time_of_day": ""
@@ -162,6 +342,7 @@
       {
         "evolution_details": [
           {
+            "is_default": false,
             "item": null,
             "trigger": {
               "name": "level-up",
@@ -171,8 +352,25 @@
               "name": "fairy",
               "url": "https://pokeapi.co/api/v2/type/18/"
             },
+            "location": null,
             "min_level": null,
             "min_happiness": null,
+            "time_of_day": ""
+          },
+          {
+            "is_default": true,
+            "item": null,
+            "trigger": {
+              "name": "level-up",
+              "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+            },
+            "known_move_type": {
+              "name": "fairy",
+              "url": "https://pokeapi.co/api/v2/type/18/"
+            },
+            "location": null,
+            "min_level": null,
+            "min_happiness": 160,
             "time_of_day": ""
           }
         ],
