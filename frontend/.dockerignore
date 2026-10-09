@@ -1,0 +1,11 @@
+# The image builds from package*.json, sources and config only; local installs and outputs stay out.
+node_modules/
+dist/
+test-results/
+playwright-report/
+coverage/
+.vite/
+.idea/
+.vscode/
+.env
+.env.*
