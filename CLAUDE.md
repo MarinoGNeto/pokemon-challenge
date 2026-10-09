@@ -70,12 +70,16 @@ An ArchUnit test must fail the build if this is broken.
 - Prefer clarity over cleverness; this code will be reviewed live with the author explaining every line.
 - Before marking a feature done: tests green (`./mvnw verify`, `npm test`), no lint errors, README updated.
 
-## Commands (fill in as the project is scaffolded)
+## Commands
+
+Dev machine is Windows: use `.\mvnw.cmd` in PowerShell (`./mvnw` on macOS/Linux).
 
 ```bash
 # backend
-cd backend && ./mvnw verify            # tests + coverage
+cd backend && ./mvnw test              # unit + ArchUnit (*Test), no Docker
+cd backend && ./mvnw verify            # + integration tests (*IT, Testcontainers) + merged JaCoCo report
 cd backend && ./mvnw spring-boot:run   # needs Postgres (docker compose up -d postgres)
+cd backend && ./mvnw spring-boot:test-run  # app + throwaway Testcontainers Postgres
 
 # frontend
 cd frontend && npm ci && npm run dev

@@ -29,10 +29,10 @@ Compose v5.5.1, git 2.56.0, identity `MarinoGNeto <marino.goncalvesneto@gmail.co
 - [x] Confirm the `Proposed` decisions in `docs/DECISIONS.md` (all Accepted 2026-10-08, see amendments)
 
 ## 1. Thursday night — foundation
-- [ ] Scaffold backend (Spring Initializr: web, validation, data-jpa, postgresql, flyway, security,
+- [x] Scaffold backend (Spring Initializr: web, validation, data-jpa, postgresql, flyway, security,
       oauth2-resource-server, cache, actuator; + caffeine, springdoc, testcontainers, wiremock, archunit, jacoco)
-- [ ] Package skeleton (domain/application/adapters/infrastructure) + **ArchUnit test first**
-- [ ] `docker-compose.yml` with Postgres; app boots; `/actuator/health` green
+- [x] Package skeleton (domain/application/adapters/infrastructure) + **ArchUnit test first**
+- [x] `docker-compose.yml` with Postgres; app boots; `/actuator/health` green
 - [ ] PokeAPI client + fixtures + WireMock tests (TDD)
 
 ## 2. Friday — backend features

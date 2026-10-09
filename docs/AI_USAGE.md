@@ -60,3 +60,22 @@ model through [`CLAUDE.md`](../CLAUDE.md) (constraints, architecture rules, TDD,
 - Rejected / corrected (and why): the draft ADR's "latest Spring Boot 4.0.8" came from model memory and was
   already outdated — a reminder to check live sources for anything version-related.
 - How validated: start.spring.io metadata, `spring-boot-dependencies-4.1.1.pom`, springdoc 3.1.1 POM (Boot 4.1.0).
+
+### 2026-10-08 21:00 — Foundation: scaffold, ArchUnit rules, health check (PLAN §1)
+- Goal: backend scaffold, package skeleton with ArchUnit rules written first, docker-compose Postgres, health check.
+- Prompt (summary): "Follow PLAN §1 strictly TDD with small Conventional Commits."
+- Output accepted: Initializr scaffold for Boot 4.1.1 (it confirmed the Boot 4 module names, e.g.
+  `spring-boot-starter-flyway`, `spring-boot-starter-webmvc-test`); Surefire `*Test` / Failsafe `*IT` split;
+  merged JaCoCo report; ArchUnit rules with a **self-test against deliberately violating fixtures**;
+  `HealthEndpointIT` over real HTTP against Testcontainers Postgres; compose with `pg_isready` health check.
+- Rejected / corrected (and why):
+  - An ArchUnit rule on empty packages passes vacuously, so "write the ArchUnit test first" would be a fake red.
+    Instead the first red test checks the *rules themselves* against fixture code that breaks each rule.
+    The guard was checked by mutation: removing Spring from the forbidden list makes the self-test fail.
+  - The fixtures were first placed under the app's base package; they carry `@Configuration`/`@RestController`,
+    so Spring's component scan would have loaded them in every integration test. Moved to `com.marinogneto.archfixture`.
+  - The red health test failed on a different line than first assumed; the AI read the actual line before
+    "fixing" anything. The green step was kept minimal (configuration only); custom security is deferred to the
+    JWT step so it is driven by its own failing tests.
+- How validated: `mvn verify` → 10 unit + 5 integration tests green; the packaged jar was started against the
+  compose Postgres and `/actuator/health` returned `db: UP`, `/api/...` returned 401.

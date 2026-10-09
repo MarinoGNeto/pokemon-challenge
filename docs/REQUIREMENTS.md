@@ -49,7 +49,7 @@ User stories must be explicitly addressed in the final presentation.
 ## Technical requirements
 
 ### Mandatory
-- [ ] Public Git repository
+- [x] Public Git repository — https://github.com/MarinoGNeto/pokemon-challenge
 - [ ] Tests included
 - [ ] Proper error handling
 - [ ] *Nice to have:* caching layer for PokeAPI responses
@@ -73,6 +73,7 @@ User stories must be explicitly addressed in the final presentation.
 ### Core business logic
 - [ ] Dedicated business layer with all domain rules and validation
 - [ ] **Independent** from both API and data access layers (enforced by ArchUnit)
+      _(Guard in place: `ArchitectureTest` + `ArchitectureRulesTest`; ticked once the business layer exists.)_
 
 ### Testing & validation
 - [ ] Thorough **unit test coverage** for every core component (+ integration tests; coverage report)

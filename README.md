@@ -38,7 +38,18 @@ docker compose up --build
 # Frontend: http://localhost:5173 (TBD)  ·  API: http://localhost:8080  ·  Swagger UI: http://localhost:8080/swagger-ui.html
 ```
 
-Local development without Docker: _TBD_.
+### Local development (backend)
+Prerequisites: Java 21, Docker. Maven is not needed — use the wrapper.
+
+```powershell
+docker compose up -d postgres        # PostgreSQL 17 on localhost:5432 (demo credentials, see .env.example)
+cd backend
+.\mvnw.cmd spring-boot:run           # Windows   (macOS/Linux: ./mvnw spring-boot:run)
+# Health: http://localhost:8080/actuator/health -> {"status":"UP","components":{"db":{"status":"UP"},...}}
+```
+
+Alternative without compose: `.\mvnw.cmd spring-boot:test-run` starts the app with a throwaway Testcontainers
+PostgreSQL (`TestPokemonApiApplication`).
 
 ## Demo credentials
 _TBD (demo-only, seeded by Flyway)._
@@ -47,7 +58,17 @@ _TBD (demo-only, seeded by Flyway)._
 _TBD — table of endpoints, auth requirements and status codes._
 
 ## Testing
-_TBD — how to run, coverage report location, TDD evidence in git history._
+| Command (in `backend/`) | Runs | Needs Docker |
+|---|---|---|
+| `.\mvnw.cmd test` | Unit and slice tests (`*Test`), incl. the ArchUnit architecture rules | No |
+| `.\mvnw.cmd verify` | Everything above + integration tests (`*IT`) against Testcontainers PostgreSQL, coverage | Yes |
+
+- Coverage (unit + integration merged): `backend/target/site/jacoco-merged/index.html`.
+- **Architecture is tested:** `ArchitectureTest` fails the build if the dependency rule
+  (`adapters/infrastructure → application → domain`) is broken; `ArchitectureRulesTest` proves each rule
+  really catches violations using deliberately broken fixture code.
+- **TDD in the history:** red tests are committed as `test: … (red)` before the `feat:` commit that makes
+  them green — see `git log --oneline`.
 
 ## GenAI
 - GenAI exercise (task management API): [`genai-exercise/`](genai-exercise/README.md)
