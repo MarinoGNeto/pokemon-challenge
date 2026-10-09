@@ -3,6 +3,17 @@ import { describe, expect, it } from 'vitest'
 import { server } from '../test/server'
 import { ApiError, apiRequest } from './client'
 
+/** Awaits a call that must fail and returns its ApiError (fails the test if it succeeds). */
+async function failure(call: Promise<unknown>): Promise<ApiError> {
+  try {
+    await call
+  } catch (error) {
+    expect(error).toBeInstanceOf(ApiError)
+    return error as ApiError
+  }
+  throw new Error('Expected the request to fail')
+}
+
 describe('apiRequest', () => {
   it('returns the parsed JSON body', async () => {
     server.use(http.get('/api/pokemon', () => HttpResponse.json({ items: [], page: 0 })))
@@ -26,9 +37,8 @@ describe('apiRequest', () => {
       ),
     )
 
-    const error = await apiRequest('/api/local-pokemon/1', { method: 'PUT', body: {} }).catch((e) => e)
+    const error = await failure(apiRequest('/api/local-pokemon/1', { method: 'PUT', body: {} }))
 
-    expect(error).toBeInstanceOf(ApiError)
     expect(error).toMatchObject({
       status: 400,
       title: 'Invalid request',
@@ -44,9 +54,8 @@ describe('apiRequest', () => {
       ),
     )
 
-    const error = await apiRequest('/api/pokemon').catch((e) => e)
+    const error = await failure(apiRequest('/api/pokemon'))
 
-    expect(error).toBeInstanceOf(ApiError)
     expect(error.status).toBe(502)
     expect(error.title).toBe('The server returned an error')
     expect(error.fieldErrors).toEqual([])
@@ -55,9 +64,8 @@ describe('apiRequest', () => {
   it('reports a network failure as status 0', async () => {
     server.use(http.get('/api/pokemon', () => HttpResponse.error()))
 
-    const error = await apiRequest('/api/pokemon').catch((e) => e)
+    const error = await failure(apiRequest('/api/pokemon'))
 
-    expect(error).toBeInstanceOf(ApiError)
     expect(error.status).toBe(0)
     expect(error.title).toBe('The server could not be reached')
   })
