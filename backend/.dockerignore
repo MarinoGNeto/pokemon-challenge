@@ -1,0 +1,9 @@
+# Only pom.xml and src/ are needed by the Dockerfile; keep the build context small and free of local state.
+target/
+.mvn/
+mvnw
+mvnw.cmd
+.idea/
+*.iml
+.vscode/
+.env
