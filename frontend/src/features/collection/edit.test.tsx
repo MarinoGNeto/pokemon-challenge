@@ -54,6 +54,10 @@ describe('Editing our notes (US04)', () => {
       },
     })
     expect(within(screen.getByRole('region', { name: 'Our notes' })).getByText('Johto')).toBeInTheDocument()
+
+    // The confirmation describes the form as saved; it must disappear as soon as the user changes something.
+    await user.type(within(form).getByLabelText('Notes'), ' More.')
+    expect(screen.queryByText('Changes saved.')).not.toBeInTheDocument()
   })
 
   it('checks the same rules as the server before sending', async () => {
