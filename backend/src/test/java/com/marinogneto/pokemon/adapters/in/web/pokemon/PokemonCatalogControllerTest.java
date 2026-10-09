@@ -145,11 +145,16 @@ class PokemonCatalogControllerTest {
                 .andExpect(jsonPath("$.evolution.speciesId").value(133))
                 .andExpect(jsonPath("$.evolution.name").value("eevee"))
                 .andExpect(jsonPath("$.evolution.condition").doesNotExist())
-                .andExpect(jsonPath("$.evolution.evolvesTo.length()").value(2))
+                .andExpect(jsonPath("$.evolution.evolvesTo.length()").value(3))
                 .andExpect(jsonPath("$.evolution.evolvesTo[0].name").value("vaporeon"))
                 .andExpect(jsonPath("$.evolution.evolvesTo[0].condition.trigger").value("use-item"))
                 .andExpect(jsonPath("$.evolution.evolvesTo[0].condition.item").value("water-stone"))
-                .andExpect(jsonPath("$.evolution.evolvesTo[1].condition.minLevel").doesNotExist());
+                .andExpect(jsonPath("$.evolution.evolvesTo[1].condition.minLevel").doesNotExist())
+                .andExpect(jsonPath("$.evolution.evolvesTo[2].name").value("espeon"))
+                .andExpect(jsonPath("$.evolution.evolvesTo[2].condition.trigger").value("level-up"))
+                .andExpect(jsonPath("$.evolution.evolvesTo[2].condition.minHappiness").value(160))
+                .andExpect(jsonPath("$.evolution.evolvesTo[2].condition.timeOfDay").value("day"))
+                .andExpect(jsonPath("$.evolution.evolvesTo[2].condition.knownMoveType").doesNotExist());
     }
 
     @Test
@@ -179,6 +184,8 @@ class PokemonCatalogControllerTest {
         EvolutionChain chain = new EvolutionChain(67, new EvolutionStage(133, "eevee", null, List.of(
                 new EvolutionStage(134, "vaporeon", new EvolutionCondition("use-item", null, "water-stone"), List.of()),
                 new EvolutionStage(135, "jolteon", new EvolutionCondition("use-item", null, "thunder-stone"),
+                        List.of()),
+                new EvolutionStage(196, "espeon", new EvolutionCondition("level-up", null, null, 160, "day", null),
                         List.of()))));
         return new PokemonDetails(133, "eevee", "https://img.example/artwork/133.png", "Evolution Pokémon",
                 "Its genetic code is irregular.", Height.ofDecimetres(3), Weight.ofHectograms(65), List.of("normal"),

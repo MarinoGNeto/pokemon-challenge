@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -131,6 +132,32 @@ class PokeApiCatalogTest {
     }
 
     @Test
+    void evolutionConditionsCoverFriendshipTimeOfDayAndMoveType() {
+        stub("/api/v2/evolution-chain/67", "evolution-chain-67.json");
+
+        List<EvolutionStage> branches = catalog.getEvolutionChain(67).root().evolvesTo();
+
+        assertThat(condition(branches, "espeon")).isEqualTo(
+                new EvolutionCondition("level-up", null, null, 160, "day", null));
+        assertThat(condition(branches, "umbreon")).isEqualTo(
+                new EvolutionCondition("level-up", null, null, 160, "night", null));
+        assertThat(condition(branches, "sylveon")).isEqualTo(
+                new EvolutionCondition("level-up", null, null, 160, null, "fairy"));
+    }
+
+    @Test
+    void theDefaultEvolutionDetailWinsOverOlderGenerations() {
+        stub("/api/v2/evolution-chain/67", "evolution-chain-67.json");
+
+        List<EvolutionStage> branches = catalog.getEvolutionChain(67).root().evolvesTo();
+
+        // Leafeon's first entry is the old "level up near a moss rock"; the is_default one is the Leaf Stone.
+        assertThat(condition(branches, "leafeon")).isEqualTo(
+                new EvolutionCondition("use-item", null, "leaf-stone", null, null, null));
+        assertThat(condition(branches, "glaceon").item()).isEqualTo("ice-stone");
+    }
+
+    @Test
     void notFoundBecomesADomainException() {
         pokeApi.stubFor(get("/api/v2/pokemon/99999").willReturn(aResponse().withStatus(404).withBody("Not Found")));
 
@@ -179,6 +206,10 @@ class PokeApiCatalogTest {
     private static PokeApiCatalog catalogWithReadTimeout(Duration readTimeout) {
         return PokeApiCatalog.create(RestClient.builder(), URI.create(pokeApi.baseUrl() + "/api/v2"),
                 Duration.ofSeconds(2), readTimeout);
+    }
+
+    private static EvolutionCondition condition(List<EvolutionStage> stages, String name) {
+        return stages.stream().filter(s -> s.speciesName().equals(name)).findFirst().orElseThrow().condition();
     }
 
     private static void stub(String path, String fixture) {
