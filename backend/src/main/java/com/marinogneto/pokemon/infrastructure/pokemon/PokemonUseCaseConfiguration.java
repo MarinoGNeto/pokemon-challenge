@@ -1,5 +1,6 @@
 package com.marinogneto.pokemon.infrastructure.pokemon;
 
+import com.marinogneto.pokemon.application.pokemon.GetPokemonDetails;
 import com.marinogneto.pokemon.application.pokemon.ListPokemon;
 import com.marinogneto.pokemon.application.port.out.PokemonCatalog;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,11 @@ class PokemonUseCaseConfiguration {
     @Bean
     ListPokemon listPokemon(PokemonCatalog catalog) {
         return new ListPokemon(catalog, catalogExecutor());
+    }
+
+    @Bean
+    GetPokemonDetails getPokemonDetails(PokemonCatalog catalog) {
+        return new GetPokemonDetails(catalog);
     }
 
     /**

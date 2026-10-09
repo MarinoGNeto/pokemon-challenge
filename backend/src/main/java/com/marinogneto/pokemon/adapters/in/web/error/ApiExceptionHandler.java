@@ -1,6 +1,7 @@
 package com.marinogneto.pokemon.adapters.in.web.error;
 
 import com.marinogneto.pokemon.application.port.out.CatalogUnavailableException;
+import com.marinogneto.pokemon.domain.pokemon.PokemonNotFoundException;
 import java.net.URI;
 import java.util.List;
 import org.slf4j.Logger;
@@ -29,6 +30,11 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     /** One field-level validation error, listed in the problem's {@code errors} property. */
     public record FieldError(String field, String message) {
+    }
+
+    @ExceptionHandler(PokemonNotFoundException.class)
+    ProblemDetail notFound(PokemonNotFoundException e) {
+        return problem(HttpStatus.NOT_FOUND, "not-found", "Pokémon not found", e.getMessage());
     }
 
     @ExceptionHandler(CatalogUnavailableException.class)
