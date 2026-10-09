@@ -221,13 +221,21 @@ class LocalPokemonControllerTest {
 
     @Test
     void deleteRequiresAuthentication() throws Exception {
-        mvc.perform(delete("/api/local-pokemon/1")).andExpect(status().isUnauthorized());
+        mvc.perform(delete("/api/local-pokemon/1"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.title").value("Authentication required"));
     }
 
     @Test
     @WithMockUser(roles = "USER")
     void deleteIsForbiddenForRegularUsers() throws Exception {
-        mvc.perform(delete("/api/local-pokemon/1")).andExpect(status().isForbidden());
+        mvc.perform(delete("/api/local-pokemon/1"))
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.status").value(403))
+                .andExpect(jsonPath("$.title").value("Access denied"))
+                .andExpect(jsonPath("$.instance").value("/api/local-pokemon/1"));
         verifyNoInteractions(deleteLocalPokemon);
     }
 
