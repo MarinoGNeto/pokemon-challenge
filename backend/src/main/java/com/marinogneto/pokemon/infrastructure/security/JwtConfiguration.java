@@ -4,11 +4,13 @@ import com.marinogneto.pokemon.adapters.out.security.BCryptPasswordHasher;
 import com.marinogneto.pokemon.adapters.out.security.JwtTokenIssuer;
 import com.marinogneto.pokemon.application.port.out.PasswordHasher;
 import com.marinogneto.pokemon.application.port.out.TokenIssuer;
+import com.marinogneto.pokemon.infrastructure.ClockConfiguration;
 import java.time.Clock;
 import javax.crypto.SecretKey;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -22,6 +24,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
  */
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(JwtProperties.class)
+@Import(ClockConfiguration.class)
 public class JwtConfiguration {
 
     public static final String ISSUER = JwtTokenIssuer.ISSUER;

@@ -18,11 +18,6 @@ import org.springframework.context.annotation.Configuration;
 class LocalPokemonConfiguration {
 
     @Bean
-    Clock clock() {
-        return Clock.systemUTC();
-    }
-
-    @Bean
     LocalPokemonRepository localPokemonRepository(PokemonJpaRepository jpa) {
         return new JpaLocalPokemonRepository(jpa);
     }

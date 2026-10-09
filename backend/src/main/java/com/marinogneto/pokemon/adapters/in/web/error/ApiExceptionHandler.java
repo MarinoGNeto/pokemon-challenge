@@ -1,5 +1,7 @@
 package com.marinogneto.pokemon.adapters.in.web.error;
 
+import com.marinogneto.pokemon.application.auth.DuplicateUserException;
+import com.marinogneto.pokemon.application.auth.InvalidCredentialsException;
 import com.marinogneto.pokemon.application.port.out.CatalogUnavailableException;
 import com.marinogneto.pokemon.domain.DomainValidationException;
 import com.marinogneto.pokemon.domain.localpokemon.LocalPokemonNotFoundException;
@@ -61,6 +63,20 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         ProblemDetail body = invalidRequest("The request breaks a validation rule.");
         body.setProperty("errors", List.of(new FieldError(e.field(), e.reason())));
         return body;
+    }
+
+    @ExceptionHandler(DuplicateUserException.class)
+    ProblemDetail duplicateUser(DuplicateUserException e) {
+        ProblemDetail body = problem(HttpStatus.CONFLICT, "already-registered", "Already registered",
+                "A user with this " + e.field() + " already exists.");
+        body.setProperty("errors", List.of(new FieldError(e.field(), "is already registered")));
+        return body;
+    }
+
+    /** Same answer for an unknown user and a wrong password (no username enumeration). */
+    @ExceptionHandler(InvalidCredentialsException.class)
+    ProblemDetail invalidCredentials(InvalidCredentialsException e) {
+        return problem(HttpStatus.UNAUTHORIZED, "invalid-credentials", "Invalid credentials", e.getMessage());
     }
 
     @ExceptionHandler(CatalogUnavailableException.class)
