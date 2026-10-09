@@ -1,13 +1,13 @@
 # PokeAPI fixtures
 
-Captured from the real API (`https://pokeapi.co/api/v2`) on 2026-10-08 and **trimmed**, never hand-written:
+Captured from the real API (`https://pokeapi.co/api/v2`) on 2026-10-08 (#2 and #3 on 2026-10-09, for a full list page) and **trimmed**, never hand-written:
 fields are deleted, never added or edited. Used by WireMock in the PokeAPI adapter tests.
 
 | File | Source | Why it is here |
 |---|---|---|
 | `pokemon-list-offset-0-limit-3.json` | `/pokemon?offset=0&limit=3` | pagination envelope (`count`, `next`, `results[].url`) |
-| `pokemon-1.json`, `pokemon-133.json` | `/pokemon/{id}` | sprite, official artwork, weight, abilities (+ hidden), stats, types |
-| `pokemon-species-1.json`, `pokemon-species-133.json` | `/pokemon-species/{id}` | category (`genera`), description (`flavor_text_entries`), evolution chain link |
+| `pokemon-{1,2,3,133}.json` | `/pokemon/{id}` | sprite, official artwork, weight, abilities (+ hidden), stats, types |
+| `pokemon-species-{1,2,3,133}.json` | `/pokemon-species/{id}` | category (`genera`), description (`flavor_text_entries`), evolution chain link |
 | `evolution-chain-1.json` | `/evolution-chain/1` | linear chain: Bulbasaur → Ivysaur → Venusaur |
 | `evolution-chain-67.json` | `/evolution-chain/67` | branching chain: Eevee → 8 evolutions |
 
