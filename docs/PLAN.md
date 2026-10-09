@@ -44,12 +44,12 @@ Compose v5.5.1, git 2.56.0, identity `MarinoGNeto <marino.goncalvesneto@gmail.co
 - [x] OpenAPI/Swagger UI reachable (with a Bearer "Authorize" button)
 
 ## 3. Saturday — frontend + packaging
-- [x] Vite React TS scaffold, routing, API client (auth context comes with stop 2)
+- [x] Vite React TS scaffold, routing, API client, auth context (login/register with return-to)
 - [x] Pokedex list (paginated grid, responsive) and detail page (artwork, stats bars, description, evolution)
-- [ ] Local catalogue: sync button, list, edit form (Zod), delete with confirm, error/empty/loading states
-- [ ] Frontend tests (Vitest + Testing Library) for key components/hooks
+- [x] Local catalogue: sync button, list, edit form (Zod), delete with confirm, error/empty/loading states
+- [x] Frontend tests (Vitest + Testing Library + MSW) for key components/hooks — 51 tests
 - [ ] Dockerfiles (backend multi-stage, frontend nginx) + full `docker compose up --build` from a clean clone
-- [ ] Zero browser console warnings check
+- [x] Zero browser console warnings check — `npm run check:browser`
 
 ### Polish backlog (later — not part of the current stops)
 - [ ] Bigger, pixelated (`image-rendering: pixelated`) sprites in the list cards

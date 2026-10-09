@@ -22,8 +22,8 @@ proprietary fields — built with **Clean Architecture** and **TDD**.
 |---|---|---|---|
 | US01 Enumeration | Paginated list with sprite, category, mass (kg), skills (cached) | `GET /api/pokemon?page=0&size=20` (public) | `/pokedex?page=1` |
 | US02 Detailed view | Official artwork, 6 core stats + total, English description, evolution tree with branches and conditions | `GET /api/pokemon/{id}` (public) | `/pokedex/{id}` |
-| US03 Synchronization | Idempotent replication into PostgreSQL; proprietary fields (localized name, region, habitat, tags, notes) survive re-syncs | `POST /api/local-pokemon` (signed in), `GET /api/local-pokemon[/{id}]` (public) | _TBD_ |
-| US04 Local modification | Replace proprietary data with optimistic locking; delete (ADMIN) | `PUT /api/local-pokemon/{id}` (signed in), `DELETE …/{id}` (ADMIN) | _TBD_ |
+| US03 Synchronization | Idempotent replication into PostgreSQL; proprietary fields (localized name, region, habitat, tags, notes) survive re-syncs | `POST /api/local-pokemon` (signed in), `GET /api/local-pokemon[/{id}]` (public) | "Add to my collection" on `/pokedex/{id}`; `/collection`, `/collection/{id}` |
+| US04 Local modification | Replace proprietary data with optimistic locking; delete (ADMIN) | `PUT /api/local-pokemon/{id}` (signed in), `DELETE …/{id}` (ADMIN) | Edit form and Delete (with confirmation) on `/collection/{id}` |
 
 ## Architecture
 _TBD — diagram + layer description. Decisions: [`docs/DECISIONS.md`](docs/DECISIONS.md)._
@@ -69,13 +69,21 @@ npm run build      # type-check + production build
 links work); TanStack Query for all server state (catalogue cached 10 min in the browser, previous page kept on
 screen while the next loads, no retries on 4xx); feature folders (`features/pokedex`, `features/collection`,
 `features/auth`), shared UI in `shared/ui`, one CSS Module per component on top of design tokens. Every error shows
-the server's RFC 9457 title and detail. Visual direction "field device readout": cool neutral surfaces, one brand red
+the server's RFC 9457 title and detail; field errors from the server land on the matching input.
+
+Signing in (`/login`, `/register`) keeps the session in memory + sessionStorage and always returns to the page you
+came from (e.g. "Sign in to add Eevee to your collection" → back on Eevee). Forms use React Hook Form + Zod with the
+backend's own rules (username format, password 8 chars–72 bytes, tag format, lengths), so most mistakes are caught
+before a request; a 409 on save offers to load the latest version; a 401 signs you out with an explanation. Delete
+is shown to admins only and asks for confirmation (focus on Cancel, Escape closes). Visual direction "field device readout": cool neutral surfaces, one brand red
 for the mark and primary actions, Pokémon type colours as the only other colour (they always carry information),
 Barlow Condensed for names/numbers/stats and Atkinson Hyperlegible for text (self-hosted). The evolution tree is drawn
 as a branching diagram on wide screens and an indented tree on phones.
 
 **Zero console warnings.** `npm run check:browser` (Playwright; `npx playwright install chromium` once) opens every
-public page at 375 and 1280 px against a running stack and fails on any console warning or error. The only line it
+page at 375 and 1280 px against a running stack, walks the signed-in journey with the demo admin (sign in from a
+Pokémon page and come back, add, edit, a validation error, delete with confirmation), and fails on any console
+warning or error. The only line it
 expects is Chrome's own network log for `/pokedex/99999`, a deliberately unknown Pokémon: the API correctly answers
 404 and Chrome logs every non-2xx response — page code cannot suppress that line.
 

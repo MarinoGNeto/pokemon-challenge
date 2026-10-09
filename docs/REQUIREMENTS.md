@@ -83,10 +83,10 @@ User stories must be explicitly addressed in the final presentation.
 
 ## Frontend
 - [x] Modern framework (React chosen) integrated with the backend — React 19 + Vite, `/api` proxied
-- [ ] **Responsive**, user-centric design
-- [ ] Standard **CRUD** operations for the functional use cases
-- [ ] Clean component organization and efficient **state management**
-- [ ] *Desired:* **no warnings in the browser console**
+- [x] **Responsive**, user-centric design — 1/2/3-column layouts, verified at 375 and 1280 px
+- [x] Standard **CRUD** operations for the functional use cases — add (sync), list/view, edit, delete
+- [x] Clean component organization and efficient **state management** — feature folders; TanStack Query (server), auth context, URL/page + form state
+- [x] *Desired:* **no warnings in the browser console** — `npm run check:browser` (only Chrome's own log line for a deliberate 404)
 
 ## Submission / delivery
 - [ ] README with environment setup and technical documentation

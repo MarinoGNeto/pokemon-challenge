@@ -219,3 +219,23 @@ model through [`CLAUDE.md`](../CLAUDE.md) (constraints, architecture rules, TDD,
     the production build, which has none. The only remaining console line is Chrome's own network log for a
     deliberate 404 (unknown Pokémon); documented instead of hiding a correct status code.
 - How validated: 27 Vitest tests, oxlint (warnings fail), type-check, production build, `npm run check:browser` OK.
+
+### 2026-10-09 19:30 — Frontend stop 2: sign-in with return-to, collection, edit form, delete
+- Goal: login/register returning to the original page, "Add to my collection", collection pages, edit form with
+  validation, delete with confirmation; zero console warnings.
+- Prompt (summary): "Go ahead with stop 2 … and stop there. Keep a short polish backlog in PLAN.md (don't do it)."
+- Output accepted: polish backlog recorded first as its own docs commit; auth context (sessionStorage, expiry);
+  SignInLink + returnPath (never back to /login); RHF + Zod forms mirroring backend rules; server field errors
+  mapped to inputs; 201/200 distinction for sync via a small `apiExchange`; 409 → "Load the latest version";
+  401 → signed out with an explanation; admin-only inline `alertdialog`; 51 tests; browser journey automated.
+- Rejected / corrected (and why):
+  - Native `<dialog>.showModal()` rejected: jsdom does not implement it, so it would need a test-only polyfill;
+    an inline `role="alertdialog"` with focus management is testable and accessible.
+  - The red test's wording "This username is already registered" was changed to "Username is already
+    registered": the "This …" pattern breaks for plural labels ("This tags must…") — flagged in the commit.
+  - Two `banner` landmarks: page headings used `<header>`; switched to `<div>` so only the site header is a banner.
+  - Lint (warnings fail) caught a keyboard handler on a non-interactive element → document-level Escape listener.
+  - The browser review caught two things tests had not: a stale "Changes saved." shown next to newly invalid
+    input (now only while the form is not dirty, with a test) and a full-width Delete button on desktop.
+- How validated: 51 Vitest tests, oxlint, type-check, build; `npm run check:browser` (13 routes + signed-in
+  journey at 375/1280 px) OK on both the dev server and the production build against the real backend.
