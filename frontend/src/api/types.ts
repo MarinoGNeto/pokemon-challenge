@@ -80,3 +80,30 @@ export interface Problem {
   instance?: string
   errors?: FieldError[]
 }
+
+/** A local Pokémon (US03/US04): `catalog` is owned by PokeAPI (read-only), `proprietary` is ours (editable). */
+export interface LocalPokemon {
+  id: number
+  version: number
+  catalog: {
+    pokeApiId: number
+    name: string
+    heightM: number
+    weightKg: number
+    spriteUrl: string | null
+    imageUrl: string | null
+    category: string | null
+    types: string[]
+    abilities: string[]
+    syncedAt: string
+  }
+  proprietary: {
+    localizedName: string | null
+    region: string | null
+    habitat: string | null
+    tags: string[]
+    notes: string | null
+  }
+  createdAt: string
+  updatedAt: string
+}

@@ -1,4 +1,4 @@
-import type { Page, PokemonDetails, PokemonSummary } from '../api/types'
+import type { LocalPokemon, Page, PokemonDetails, PokemonSummary } from '../api/types'
 
 export const bulbasaur: PokemonSummary = {
   id: 1,
@@ -85,4 +85,38 @@ export const ivysaurDetails: PokemonDetails = {
       },
     ],
   },
+}
+
+export const localBulbasaur: LocalPokemon = {
+  id: 1,
+  version: 3,
+  catalog: {
+    pokeApiId: 1,
+    name: 'bulbasaur',
+    heightM: 0.7,
+    weightKg: 6.9,
+    spriteUrl: 'https://img.example/sprites/1.png',
+    imageUrl: 'https://img.example/artwork/1.png',
+    category: 'Seed Pokémon',
+    types: ['grass', 'poison'],
+    abilities: ['overgrow', 'chlorophyll'],
+    syncedAt: '2026-10-09T16:30:00Z',
+  },
+  proprietary: {
+    localizedName: 'フシギダネ',
+    region: 'Kanto',
+    habitat: 'grassland',
+    tags: ['gen-1', 'starter'],
+    notes: 'Demo data seeded by Flyway (V2).',
+  },
+  createdAt: '2026-10-09T16:30:00Z',
+  updatedAt: '2026-10-09T16:30:00Z',
+}
+
+export const localEevee: LocalPokemon = {
+  ...localBulbasaur,
+  id: 7,
+  version: 0,
+  catalog: { ...localBulbasaur.catalog, pokeApiId: 133, name: 'eevee', category: 'Evolution Pokémon', types: ['normal'] },
+  proprietary: { localizedName: null, region: null, habitat: null, tags: [], notes: null },
 }
