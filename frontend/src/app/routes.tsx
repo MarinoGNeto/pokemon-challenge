@@ -1,6 +1,7 @@
 import type { RouteObject } from 'react-router'
 import { Navigate } from 'react-router'
 import { PokedexPage } from '../features/pokedex/PokedexPage'
+import { PokemonDetailPage } from '../features/pokedex/PokemonDetailPage'
 import { AppShell } from './AppShell'
 import { NotFoundPage } from './NotFoundPage'
 
@@ -10,6 +11,7 @@ export const routes: RouteObject[] = [
     children: [
       { index: true, element: <Navigate to="/pokedex" replace /> },
       { path: 'pokedex', element: <PokedexPage /> },
+      { path: 'pokedex/:id', element: <PokemonDetailPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

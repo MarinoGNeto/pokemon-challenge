@@ -4,12 +4,15 @@ import { TypeBadge } from '../../shared/ui/TypeBadge'
 import { dexNumber, displayName, formatKg } from './format'
 import styles from './PokemonListItem.module.css'
 
-/** One US01 entry: sprite, category, weight (kg) and abilities are always visible. */
-export function PokemonListItem({ pokemon }: { pokemon: PokemonSummary }) {
+/**
+ * One US01 entry: sprite, category, weight (kg) and abilities are always visible.
+ * The list's query string travels in the link state so "Back to the list" returns to the same page.
+ */
+export function PokemonListItem({ pokemon, listSearch }: { pokemon: PokemonSummary; listSearch: string }) {
   const primaryType = pokemon.types[0] ?? 'unknown'
   return (
     <li className={`${styles.item} type-${primaryType}`}>
-      <Link to={`/pokedex/${pokemon.id}`} className={styles.link}>
+      <Link to={`/pokedex/${pokemon.id}`} state={{ listSearch }} className={styles.link}>
         <div className={styles.sprite}>
           {pokemon.spriteUrl ? (
             <img src={pokemon.spriteUrl} alt="" width={96} height={96} loading="lazy" />

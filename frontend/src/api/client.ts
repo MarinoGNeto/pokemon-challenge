@@ -78,3 +78,8 @@ async function readProblem(response: Response): Promise<Problem> {
   }
   return { status: response.status, detail: `The server answered with status ${response.status}.` }
 }
+
+/** A 4xx will fail the same way again; network failures and 5xx may not. */
+export function isRetryable(error: unknown): boolean {
+  return !(error instanceof ApiError) || error.status === 0 || error.status >= 500
+}

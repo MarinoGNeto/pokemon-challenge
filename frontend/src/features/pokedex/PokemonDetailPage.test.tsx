@@ -16,12 +16,13 @@ describe('Pokémon detail page', () => {
 
     renderRoute('/pokedex/133')
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'Eevee' })).toBeInTheDocument()
+    const heading = await screen.findByRole('heading', { level: 1, name: 'Eevee' })
+    // the number sits with the name (it also appears again in the evolution tree)
+    expect(heading.parentElement).toHaveTextContent('#0133')
     expect(screen.getByRole('img', { name: 'Eevee official artwork' })).toHaveAttribute(
       'src',
       'https://img.example/artwork/133.png',
     )
-    expect(screen.getByText('#0133')).toBeInTheDocument()
     expect(screen.getByText(/Its genetic code is irregular/)).toBeInTheDocument()
     const facts = screen.getByRole('region', { name: 'Facts' })
     expect(within(facts).getByText('Evolution Pokémon')).toBeInTheDocument()

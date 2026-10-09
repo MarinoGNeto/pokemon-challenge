@@ -1,0 +1,155 @@
+/*
+ * Phones: an indented vertical tree. Wider screens: a left-to-right diagram, children stacked beside their
+ * parent with connector lines. Lines are drawn with borders on pseudo-elements, so the markup stays a plain
+ * nested list.
+ */
+.section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  padding: var(--space-4);
+}
+
+.title {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-3);
+}
+
+.note {
+  margin: 0 0 var(--space-3);
+  color: var(--color-ink-muted);
+}
+
+.tree,
+.children {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.node {
+  display: inline-grid;
+  gap: 0.1rem;
+  min-width: 9rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+}
+
+.current {
+  border: 2px solid var(--color-brand);
+  background: var(--color-surface);
+}
+
+.condition {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+
+.link {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  text-decoration: none;
+}
+
+.link:hover .name {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.number {
+  font-family: var(--font-display);
+  font-weight: 500;
+  color: var(--color-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-lg);
+}
+
+/* Phones: vertical, indented, with a rail on the left of each group of children */
+.children {
+  margin-left: var(--space-4);
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--color-line);
+}
+
+.children > .stage {
+  position: relative;
+  margin-top: var(--space-3);
+}
+
+.children > .stage::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--space-4));
+  top: 1.6rem;
+  width: var(--space-4);
+  border-top: 2px solid var(--color-line);
+}
+
+/* Wider screens: left to right */
+@media (min-width: 48rem) {
+  .stage {
+    display: flex;
+    align-items: center;
+  }
+
+  .children {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-left: 0;
+    padding-left: var(--space-6);
+    border-left: 0;
+  }
+
+  /* line from the parent node to the rail */
+  .children::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: calc(var(--space-6) / 2);
+    border-top: 2px solid var(--color-line);
+  }
+
+  .children > .stage {
+    margin-top: 0;
+  }
+
+  /* rail segment + tick for each child */
+  .children > .stage::before {
+    left: calc(-1 * var(--space-6) / 2);
+    top: 50%;
+    width: calc(var(--space-6) / 2);
+  }
+
+  .children > .stage::after {
+    content: '';
+    position: absolute;
+    left: calc(-1 * var(--space-6) / 2);
+    top: calc(-1 * var(--space-3) / 2);
+    bottom: calc(-1 * var(--space-3) / 2);
+    border-left: 2px solid var(--color-line);
+  }
+
+  .children > .stage:first-child::after {
+    top: 50%;
+  }
+
+  .children > .stage:last-child::after {
+    bottom: 50%;
+  }
+
+  .children > .stage:only-child::after {
+    display: none;
+  }
+}
