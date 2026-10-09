@@ -8,6 +8,8 @@ import { SignInLink } from '../auth/SignInLink'
 import { useAuth } from '../auth/useAuth'
 import { dexNumber, displayName, formatKg, formatMetres } from '../pokedex/format'
 import { useLocalPokemon } from './api'
+import { DeleteLocalPokemon } from './DeleteLocalPokemon'
+import { EditProprietaryForm } from './EditProprietaryForm'
 import styles from './LocalPokemonPage.module.css'
 
 const DATE_TIME = new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeStyle: 'short' })
@@ -70,40 +72,44 @@ function LocalPokemonView({ pokemon }: { pokemon: LocalPokemon }) {
         <h1 className={styles.name}>{name}</h1>
         {proprietary.localizedName && <p className={styles.localized}>{proprietary.localizedName}</p>}
       </div>
+      {session?.role === 'ADMIN' && <DeleteLocalPokemon id={pokemon.id} name={catalog.name} />}
 
       <div className={styles.columns}>
-        <section aria-labelledby="ours-title" className={styles.panel}>
-          <h2 id="ours-title" className={styles.panelTitle}>
-            Our notes
-          </h2>
-          <dl className={styles.facts}>
-            <dt>Name in another language</dt>
-            <dd>{proprietary.localizedName ?? <Empty />}</dd>
-            <dt>Region</dt>
-            <dd>{proprietary.region ?? <Empty />}</dd>
-            <dt>Habitat</dt>
-            <dd>{proprietary.habitat ?? <Empty />}</dd>
-            <dt>Tags</dt>
-            <dd>
-              {proprietary.tags.length > 0 ? (
-                <ul className={styles.tags}>
-                  {proprietary.tags.map((tag) => (
-                    <li key={tag}>{tag}</li>
-                  ))}
-                </ul>
-              ) : (
-                <Empty />
-              )}
-            </dd>
-            <dt>Notes</dt>
-            <dd className={styles.notes}>{proprietary.notes ?? <Empty />}</dd>
-          </dl>
-          {!session && (
-            <p className={styles.signIn}>
-              <SignInLink>Sign in to edit</SignInLink>
-            </p>
-          )}
-        </section>
+        <div className={styles.stack}>
+          <section aria-labelledby="ours-title" className={styles.panel}>
+            <h2 id="ours-title" className={styles.panelTitle}>
+              Our notes
+            </h2>
+            <dl className={styles.facts}>
+              <dt>Name in another language</dt>
+              <dd>{proprietary.localizedName ?? <Empty />}</dd>
+              <dt>Region</dt>
+              <dd>{proprietary.region ?? <Empty />}</dd>
+              <dt>Habitat</dt>
+              <dd>{proprietary.habitat ?? <Empty />}</dd>
+              <dt>Tags</dt>
+              <dd>
+                {proprietary.tags.length > 0 ? (
+                  <ul className={styles.tags}>
+                    {proprietary.tags.map((tag) => (
+                      <li key={tag}>{tag}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <Empty />
+                )}
+              </dd>
+              <dt>Notes</dt>
+              <dd className={styles.notes}>{proprietary.notes ?? <Empty />}</dd>
+            </dl>
+            {!session && (
+              <p className={styles.signIn}>
+                <SignInLink>Sign in to edit</SignInLink>
+              </p>
+            )}
+          </section>
+          {session && <EditProprietaryForm pokemon={pokemon} />}
+        </div>
 
         <section aria-labelledby="catalog-title" className={styles.panel}>
           <h2 id="catalog-title" className={styles.panelTitle}>

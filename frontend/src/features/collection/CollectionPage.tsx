@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from 'react-router'
+import { Link, useLocation, useSearchParams } from 'react-router'
 import { isRetryable } from '../../api/client'
 import type { LocalPokemon } from '../../api/types'
 import { LoadingState } from '../../shared/ui/LoadingState'
@@ -15,6 +15,7 @@ export function CollectionPage() {
   const [params] = useSearchParams()
   const pageNumber = pageFromUrl(params.get('page'))
   const query = useCollectionPage(pageNumber - 1, PAGE_SIZE)
+  const notice = (useLocation().state as { notice?: string } | null)?.notice
 
   return (
     <section aria-labelledby="collection-title">
@@ -24,6 +25,7 @@ export function CollectionPage() {
           <p className={styles.count}>{query.data.totalElements} Pokémon stored locally</p>
         )}
       </div>
+      {notice && <output className={styles.notice}>{notice}</output>}
       {query.isPending && <LoadingState label="Loading the collection…" />}
       {query.isError && (
         <ProblemMessage

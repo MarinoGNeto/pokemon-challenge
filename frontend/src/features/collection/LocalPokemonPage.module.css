@@ -119,3 +119,9 @@
   margin: 0;
   font-weight: 700;
 }
+
+.stack {
+  display: grid;
+  gap: var(--space-5);
+  align-content: start;
+}
