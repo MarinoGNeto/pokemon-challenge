@@ -81,6 +81,14 @@ final class PokeApiResponses {
             @JsonProperty("evolves_to") List<ChainLink> evolvesTo) {
     }
 
-    record EvolutionDetail(NamedResource trigger, @JsonProperty("min_level") Integer minLevel, NamedResource item) {
+    /** One way to evolve; PokeAPI lists one entry per game generation and flags the canonical one. */
+    record EvolutionDetail(
+            @JsonProperty("is_default") boolean isDefault,
+            NamedResource trigger,
+            @JsonProperty("min_level") Integer minLevel,
+            NamedResource item,
+            @JsonProperty("min_happiness") Integer minHappiness,
+            @JsonProperty("time_of_day") String timeOfDay,
+            @JsonProperty("known_move_type") NamedResource knownMoveType) {
     }
 }

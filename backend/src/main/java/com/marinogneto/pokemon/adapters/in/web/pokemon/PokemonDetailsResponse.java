@@ -39,13 +39,18 @@ public record PokemonDetailsResponse(int id, String name, String imageUrl, Strin
         }
     }
 
-    /** e.g. {@code {"trigger":"level-up","minLevel":16}} or {@code {"trigger":"use-item","item":"water-stone"}}. */
+    /**
+     * How a stage is reached; only the requirements that apply are present, e.g.
+     * {@code {"trigger":"use-item","item":"water-stone"}} or
+     * {@code {"trigger":"level-up","minHappiness":160,"timeOfDay":"day"}}.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record ConditionResponse(String trigger, Integer minLevel, String item) {
+    public record ConditionResponse(String trigger, Integer minLevel, String item, Integer minHappiness,
+                                    String timeOfDay, String knownMoveType) {
 
-        static ConditionResponse from(EvolutionCondition condition) {
-            return condition == null ? null
-                    : new ConditionResponse(condition.trigger(), condition.minLevel(), condition.item());
+        static ConditionResponse from(EvolutionCondition c) {
+            return c == null ? null : new ConditionResponse(c.trigger(), c.minLevel(), c.item(), c.minHappiness(),
+                    c.timeOfDay(), c.knownMoveType());
         }
     }
 

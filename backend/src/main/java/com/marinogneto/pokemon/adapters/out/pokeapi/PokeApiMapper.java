@@ -108,16 +108,34 @@ final class PokeApiMapper {
         return new EvolutionStage(idFromUrl(link.species().url()), link.species().name(), condition, next);
     }
 
-    /** A stage can list several alternative ways to evolve (one per game); the first is the canonical one. */
+    /**
+     * PokeAPI lists one way to evolve per game generation (Leafeon: a moss rock in older games, a Leaf Stone
+     * today) and marks the canonical one with {@code is_default}; without a flag, the first entry is used.
+     */
     private static EvolutionCondition toCondition(List<EvolutionDetail> details) {
         if (details.isEmpty()) {
             return null;
         }
-        EvolutionDetail detail = details.getFirst();
+        EvolutionDetail detail = details.stream()
+                .filter(EvolutionDetail::isDefault)
+                .findFirst()
+                .orElse(details.getFirst());
         return new EvolutionCondition(
-                detail.trigger() == null ? null : detail.trigger().name(),
+                nameOf(detail.trigger()),
                 detail.minLevel(),
-                detail.item() == null ? null : detail.item().name());
+                nameOf(detail.item()),
+                detail.minHappiness(),
+                blankToNull(detail.timeOfDay()),
+                nameOf(detail.knownMoveType()));
+    }
+
+    private static String nameOf(NamedResource resource) {
+        return resource == null ? null : resource.name();
+    }
+
+    /** PokeAPI sends {@code ""} rather than {@code null} for "no time-of-day requirement". */
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value;
     }
 
     private static BaseStats toStats(List<StatValue> stats) {

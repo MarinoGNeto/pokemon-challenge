@@ -79,6 +79,12 @@ class GetPokemonDetailsIT {
         assertThat(branches).containsExactly(
                 "vaporeon", "jolteon", "flareon", "espeon", "umbreon", "leafeon", "glaceon", "sylveon");
         assertThat(root.path("evolvesTo").get(0).path("condition").path("item").asString()).isEqualTo("water-stone");
+        JsonNode espeon = root.path("evolvesTo").get(3).path("condition");
+        assertThat(espeon.path("trigger").asString()).isEqualTo("level-up");
+        assertThat(espeon.path("minHappiness").asInt()).isEqualTo(160);
+        assertThat(espeon.path("timeOfDay").asString()).isEqualTo("day");
+        assertThat(root.path("evolvesTo").get(4).path("condition").path("timeOfDay").asString()).isEqualTo("night");
+        assertThat(root.path("evolvesTo").get(5).path("condition").path("item").asString()).isEqualTo("leaf-stone");
     }
 
     @Test
