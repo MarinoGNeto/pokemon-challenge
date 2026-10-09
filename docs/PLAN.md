@@ -51,6 +51,12 @@ Compose v5.5.1, git 2.56.0, identity `MarinoGNeto <marino.goncalvesneto@gmail.co
 - [ ] Dockerfiles (backend multi-stage, frontend nginx) + full `docker compose up --build` from a clean clone
 - [ ] Zero browser console warnings check
 
+### Polish backlog (later — not part of the current stops)
+- [ ] Bigger, pixelated (`image-rendering: pixelated`) sprites in the list cards
+- [ ] Larger, centred evolution tree with more readable condition labels
+- [ ] Fill the empty space next to *Facts* on the desktop detail page
+- [ ] Weights without a trailing zero: "100 kg" instead of "100.0 kg" (keep one decimal when it is not zero)
+
 ## 4. Sunday morning — GenAI exercise, docs, final QA
 - [ ] `genai-exercise/`: prompt → raw output commit → review commits → write-up (see its README)
 - [ ] README final: overview, user story mapping, architecture diagram, setup, credentials, API table,
