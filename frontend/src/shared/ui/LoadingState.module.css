@@ -1,0 +1,4 @@
+.loading {
+  display: block;
+  color: var(--color-ink-muted);
+}
