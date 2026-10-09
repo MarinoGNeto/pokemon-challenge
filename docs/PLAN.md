@@ -33,7 +33,7 @@ Compose v5.5.1, git 2.56.0, identity `MarinoGNeto <marino.goncalvesneto@gmail.co
       oauth2-resource-server, cache, actuator; + caffeine, springdoc, testcontainers, wiremock, archunit, jacoco)
 - [x] Package skeleton (domain/application/adapters/infrastructure) + **ArchUnit test first**
 - [x] `docker-compose.yml` with Postgres; app boots; `/actuator/health` green
-- [ ] PokeAPI client + fixtures + WireMock tests (TDD)
+- [x] PokeAPI client + fixtures + WireMock tests (TDD)
 
 ## 2. Friday — backend features
 - [ ] US01 list with pagination + caching (unit + web slice + integration tests)

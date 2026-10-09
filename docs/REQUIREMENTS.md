@@ -21,6 +21,8 @@ User stories must be explicitly addressed in the final presentation.
 
 ### PokeAPI integration
 - [ ] REST API with Spring Boot that talks to the external PokeAPI
+      _(Client done: `PokeApiCatalog` behind the `PokemonCatalog` port, WireMock-tested with real fixtures;
+      REST endpoints come with US01/US02.)_
 
 ### US01 — Pokemon enumeration
 - [ ] Browse Pokemon with **pagination**

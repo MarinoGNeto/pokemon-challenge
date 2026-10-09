@@ -79,3 +79,22 @@ model through [`CLAUDE.md`](../CLAUDE.md) (constraints, architecture rules, TDD,
     JWT step so it is driven by its own failing tests.
 - How validated: `mvn verify` → 10 unit + 5 integration tests green; the packaged jar was started against the
   compose Postgres and `/actuator/health` returned `db: UP`, `/api/...` returned 401.
+
+### 2026-10-08 21:40 — PokeAPI client with WireMock (PLAN §1, last item)
+- Goal: PokeAPI adapter behind an output port, tested against real payloads, TDD.
+- Prompt (summary): "Continue with PLAN §1: PokeAPI client + fixtures + WireMock tests, strictly TDD."
+- Output accepted: fixtures captured from the live API and only *trimmed* (documented in
+  `src/test/resources/pokeapi/README.md`); a framework-free domain model (Weight/Height unit conversion, evolution
+  **tree** for Eevee's 8 branches); `PokemonCatalog` port; `PokeApiCatalog` adapter with an anti-corruption mapper,
+  timeouts and error translation (404 → domain `PokemonNotFoundException`; 5xx/timeout/reset/bad JSON →
+  `CatalogUnavailableException`).
+- Rejected / corrected (and why):
+  - Field names were read from real responses before writing DTOs (e.g. `official-artwork`, `is_hidden`,
+    `flavor_text` containing `\n` and `\f`), not from model memory.
+  - Boot 4 again: `RestClient.Builder` needs `spring-boot-starter-restclient`; verified on Maven Central first.
+  - The first green run had one deterministic failure. The AI did not just raise a timeout until it passed: it
+    showed the failure followed whichever test ran first (JVM warm-up), ruled out an HTTP/2-upgrade hypothesis
+    with an experiment, and fixed the *test design* (a 500 ms timeout had been applied to every test only to keep
+    the timeout test fast).
+- How validated: 35 unit + 5 integration tests green (twice); a throwaway live check against pokeapi.co mapped
+  Pikachu, Eevee's species and its 8-branch chain, and turned an unknown id into `PokemonNotFoundException`.
