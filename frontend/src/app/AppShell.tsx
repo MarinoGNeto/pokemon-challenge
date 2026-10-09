@@ -1,7 +1,10 @@
 import { NavLink, Outlet, ScrollRestoration } from 'react-router'
+import { SignInLink } from '../features/auth/SignInLink'
+import { useAuth } from '../features/auth/useAuth'
 import styles from './AppShell.module.css'
 
 export function AppShell() {
+  const { session, signOut } = useAuth()
   return (
     <div className={styles.shell}>
       <a className={styles.skip} href="#main">
@@ -26,6 +29,21 @@ export function AppShell() {
               </li>
             </ul>
           </nav>
+          <div className={styles.account}>
+            {session ? (
+              <>
+                <span className={styles.who}>
+                  <span>Signed in as {session.username}</span>
+                  {session.role === 'ADMIN' && <span className={styles.role}>Admin</span>}
+                </span>
+                <button type="button" className={styles.signOut} onClick={signOut}>
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <SignInLink className={styles.signIn}>Sign in</SignInLink>
+            )}
+          </div>
         </div>
       </header>
       <main id="main" className={styles.main}>

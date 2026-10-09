@@ -67,10 +67,10 @@ function DetailsView({ pokemon, backLink }: { pokemon: PokemonDetails; backLink:
   return (
     <article className={styles.page}>
       {backLink}
-      <header className={styles.title}>
+      <div className={styles.title}>
         <p className={styles.number}>{dexNumber(pokemon.id)}</p>
         <h1 className={styles.name}>{name}</h1>
-      </header>
+      </div>
 
       <div className={styles.columns}>
         <div className={styles.left}>

@@ -16,12 +16,12 @@ export function PokedexPage() {
 
   return (
     <section aria-labelledby="pokedex-title">
-      <header className={styles.heading}>
+      <div className={styles.heading}>
         <h1 id="pokedex-title">Browse Pokémon</h1>
         {query.data && (
           <p className={styles.count}>{query.data.totalElements.toLocaleString('en')} Pokémon in the catalogue</p>
         )}
-      </header>
+      </div>
 
       {query.isPending && <LoadingState label="Loading Pokémon…" />}
       {query.isError && (

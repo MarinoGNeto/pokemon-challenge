@@ -181,7 +181,7 @@ describe('Registering', () => {
     await user.type(screen.getByLabelText('Password'), 'long-enough-1')
     await user.click(screen.getByRole('button', { name: 'Create account' }))
 
-    expect(await screen.findByText('This username is already registered')).toBeInTheDocument()
+    expect(await screen.findByText('Username is already registered')).toBeInTheDocument()
     expect(screen.getByLabelText('Username')).toHaveAttribute('aria-invalid', 'true')
   })
 })
