@@ -4,14 +4,19 @@ The evaluation explicitly rewards *fluency with GenAI tools, prompt engineering 
 AI-generated code*. This log records, as the work happens, how AI was used on the **main project**
 (the separate GenAI exercise is in [`../genai-exercise/`](../genai-exercise/README.md)).
 
-**Tooling:** Claude (Claude Code / Claude app) as pair programmer. Project context and guard-rails are given to the
-model through [`CLAUDE.md`](../CLAUDE.md) (constraints, architecture rules, TDD, error contract).
+**Tooling:** Claude Code wrote most of the code and tests; I set the architecture and the stack, made the decisions,
+steered each step and reviewed and verified the results. Project context and guard-rails are given to the model
+through [`CLAUDE.md`](../CLAUDE.md) (constraints, architecture rules, TDD, error contract); the implementation session
+started from [`KICKOFF_PROMPT.md`](KICKOFF_PROMPT.md).
 
 **Principles followed**
-- I own the design: decisions are recorded in `DECISIONS.md` *before* asking the AI to implement them.
-- Tests are the acceptance criteria for AI output: red test first, AI may propose the implementation, I review the diff.
+- I own the design: the AI drafts decisions in `DECISIONS.md` as *Proposed*; I accept or amend each one before
+  anything is implemented.
+- Tests are the acceptance criteria for AI output: the AI writes the failing test first, then the implementation;
+  I review both.
 - Nothing about PokeAPI is trusted from model memory: payloads are verified against real responses / fixtures.
-- Every AI-generated diff is read line by line; I must be able to explain it in the code review.
+- I review each step's result and verify it on my machine (tests, Docker, manual run) before moving on, and I must
+  be able to explain any of it in the code review.
 
 ## Entry template
 
@@ -267,3 +272,26 @@ model through [`CLAUDE.md`](../CLAUDE.md) (constraints, architecture rules, TDD,
   ~1m40s; health UP with db; seeded 12 local Pokémon; Eevee from live PokeAPI through nginx; admin login + sync
   (201) + 401 ProblemDetail through nginx; Swagger 200; `npm run check:browser` against http://localhost:3000
   (13 routes + signed-in journey at 375/1280 px) OK with only the expected 404 line; no ERROR in backend logs.
+
+### 2026-10-10 13:20 — GenAI exercise review and final documentation
+- Goal: review the generated task API critically, fix what matters, and finish the presentation docs.
+- Prompt (summary): "Review genai-exercise/task-api as a strict senior reviewer against PROMPT.md; don't change
+  anything yet", then "fix #1, #2, #3, #6 and #16 test-first, one commit each; document the rest", then the README
+  write-ups and a recruiter-eye review of the root README.
+- Output accepted: [`REVIEW.md`](../genai-exercise/REVIEW.md) with 26 findings, each confirmed by reading the code and,
+  for behaviour, by black-box probes on a copy (e.g. an 80-byte password returned 500); four test-first fixes
+  (committed JWT fallback secret, missing field errors on some 400s, BCrypt byte limit, unscoped repository methods);
+  the GenAI README sections; the root README's architecture, thought-process and "How AI was used" sections.
+- Rejected / corrected (and why):
+  - **The AI's own review was wrong once.** Finding #16 said the service isolation tests would pass for a service
+    that always returns 404. Before fixing it, two mutants (swapped lookup arguments, always-404) were run against
+    the original tests: both failed, because `MockitoExtension` uses strict stubs. The claim was withdrawn and
+    recorded in REVIEW.md's Corrections section instead of committing a "fix" for a bug that did not exist.
+  - Two review rows were unfair to the model: it *had* disclosed the dev default secret and the UTC assumption in
+    its own assumptions list. Corrected before committing.
+  - A first version of the JWT-secret test passed for the wrong reason (an empty env var overrides a
+    `${…:default}` placeholder); it was rewritten to remove the environment source so it fails on the real problem.
+  - The AI's wording in this log overstated my role ("pair programmer", "every diff read line by line") and is
+    replaced by what actually happens.
+- How validated: task-api 93 → 106 tests, each fix red before green on an identical copy (Java 21) and checked by
+  checksum against my files; the app started with and without `APP_JWT_SECRET` as documented.
