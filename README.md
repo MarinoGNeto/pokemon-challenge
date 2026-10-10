@@ -11,7 +11,7 @@ proprietary fields — built with **Clean Architecture** and **TDD**.
 - [Demo credentials](#demo-credentials)
 - [API](#api)
 - [Testing](#testing)
-- [GenAI](#genai)
+- [GenAI and how AI was used](#genai-and-how-ai-was-used)
 - [Thought process & trade-offs](#thought-process--trade-offs)
 
 ## User stories → implementation
@@ -53,7 +53,7 @@ catches its violation.
 Prerequisites: Docker (Desktop) with Compose v2. Nothing else — no Java, Node or `.env` needed.
 
 ```bash
-git clone <repo-url> && cd pokemon-challenge
+git clone https://github.com/MarinoGNeto/pokemon-challenge.git && cd pokemon-challenge
 docker compose up --build
 ```
 
@@ -181,19 +181,22 @@ across all users, and every response is cached for 24 h (Caffeine). Measured aga
 first page **1.2 s**, same page again **12 ms**.
 
 ## Testing
-| Command (in `backend/`) | Runs | Needs Docker |
-|---|---|---|
-| `.\mvnw.cmd test` | Unit and slice tests (`*Test`), incl. the ArchUnit architecture rules | No |
-| `.\mvnw.cmd verify` | Everything above + integration tests (`*IT`) against Testcontainers PostgreSQL, coverage | Yes |
+Results of a fresh run from a clean clone on 2026-10-10:
 
-- Coverage (unit + integration merged): `backend/target/site/jacoco-merged/index.html`.
-- **Architecture is tested:** `ArchitectureTest` fails the build if the dependency rule
-  (`adapters/infrastructure → application → domain`) is broken; `ArchitectureRulesTest` proves each rule
-  really catches violations using deliberately broken fixture code.
+| Where | Command | What runs | Result |
+|---|---|---|---|
+| `backend/` | `.\mvnw.cmd test` | Unit and slice tests (`*Test`), incl. the ArchUnit rules. No Docker needed | 134 passed |
+| `backend/` | `.\mvnw.cmd verify` | The above + integration tests (`*IT`) against Testcontainers PostgreSQL, with PokeAPI stubbed by WireMock; merged coverage report. Needs Docker | 25 passed · coverage **98% lines, 84% branches** |
+| `frontend/` | `npm test` | Vitest + Testing Library + MSW | 51 passed |
+| `frontend/` | `npm run lint` · `npm run build` | oxlint (warnings fail) · type-check + production build | clean |
+| `frontend/` | `npm run check:browser` | Playwright: every page at 375 and 1280 px plus the signed-in journey; fails on any console warning | needs a running stack ([details](#local-development-frontend)) |
+
+- Coverage report (unit + integration merged): `backend/target/site/jacoco-merged/index.html`.
+- **Architecture is tested** by `ArchitectureTest` and `ArchitectureRulesTest` (see [Architecture](#architecture)).
 - **TDD in the history:** red tests are committed as `test: … (red)` before the `feat:` commit that makes
-  them green — see `git log --oneline`.
+  them green; see `git log --oneline`.
 
-## GenAI
+## GenAI and how AI was used
 **Exercise ([`genai-exercise/`](genai-exercise/README.md)).** One prompt generated a task-management API; the raw
 output is committed untouched. A strict review found 26 issues (one High: a JWT signing secret committed as a
 fallback); 4 were fixed test-first, one commit each, and the rest are documented with the fix they would need.
