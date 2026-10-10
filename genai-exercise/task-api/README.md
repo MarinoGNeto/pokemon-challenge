@@ -4,18 +4,34 @@ A REST API for a simple task manager. Java 21, **Spring Boot 4.1.1**, stateless 
 
 ## Run
 
+`APP_JWT_SECRET` is required: without it the app refuses to start. For local development, use the `dev` profile, which supplies a local-only secret:
+
 ```bash
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev     # local only: dev signing secret
-APP_JWT_SECRET=<at least 32 random bytes> ./mvnw spring-boot:run   # any other environment
+# macOS / Linux
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+
+# Windows (PowerShell): quote the -D argument
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=dev"
 ```
 
-(Windows: `mvnw.cmd` instead of `./mvnw`.)
+Anywhere else, set a real secret of at least 32 bytes instead of using the profile:
+
+```bash
+# macOS / Linux
+APP_JWT_SECRET="$(openssl rand -base64 48)" ./mvnw spring-boot:run
+
+# Windows (PowerShell 7+): cryptographically random bytes
+$env:APP_JWT_SECRET = [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(48))
+.\mvnw.cmd spring-boot:run
+```
 
 The API listens on `http://localhost:8080/api/v1`. The database is an in-memory H2 instance, so data is lost on restart.
 
-The JWT signing secret comes from `APP_JWT_SECRET`, which must be at least 32 bytes. There is no default: without it the app refuses to start. A local-only secret lives in the `dev` profile (`application-dev.yml`); never activate that profile outside your machine.
+The `dev` profile's secret (`application-dev.yml`) is committed to the repo, so never activate that profile outside your own machine.
 
 ## Test
+
+Tests need no secret: they run with a test-only one from the `test` profile (`src/test/resources/application-test.yml`).
 
 ```bash
 ./mvnw test        # all tests

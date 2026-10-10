@@ -22,7 +22,7 @@ Process followed so the reviewer can *see* the critical evaluation:
 2. Run the prompt; commit the **raw, untouched AI output** in one commit (`chore(genai): raw AI output`).
 3. Review; each fix is its own commit (`fix(genai): ...`) referenced in `REVIEW.md`, and every finding
    left unfixed is documented there with the fix it would need.
-   `git diff <raw-commit>..HEAD -- genai-exercise/` shows exactly what the human changed.
+   `git diff <raw-commit>..HEAD -- genai-exercise/` shows exactly what changed after the raw output.
 
 ## 1. The prompt
 See [`PROMPT.md`](PROMPT.md). Prompt engineering techniques used: role + context, explicit constraints, acceptance
