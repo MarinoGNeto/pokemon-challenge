@@ -1,6 +1,7 @@
-# Prompt (DRAFT — review and own it before running)
+# Prompt
 
-> Final version must be committed **before** running it, then the raw output committed untouched.
+Sent verbatim to Claude Code in a fresh session, in an empty folder (no project context or
+CLAUDE.md), so the raw output reflects only this prompt. Committed before running it.
 
 ```text
 You are a senior Java backend engineer. Generate a production-quality RESTful API for a simple task
