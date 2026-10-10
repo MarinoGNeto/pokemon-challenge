@@ -1,5 +1,6 @@
 package com.example.taskapi.user.api;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -57,6 +58,39 @@ class AuthControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.errors.length()").value(2));
+        verifyNoInteractions(authService);
+    }
+
+    /** Review #3: BCrypt rejects passwords over 72 bytes; a multibyte password must be a 400, not a 500. */
+    @Test
+    void registerReturns400WhenPasswordExceeds72Bytes() throws Exception {
+        String password = "é".repeat(37); // 37 characters, 74 bytes in UTF-8
+
+        mvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"alice\",\"password\":\"" + password + "\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.errors[0].field").value("password"))
+                .andExpect(jsonPath("$.errors[0].message").value("must be at most 72 bytes in UTF-8"));
+        verifyNoInteractions(authService);
+    }
+
+    @Test
+    void registerAcceptsPasswordOfExactly72Bytes() throws Exception {
+        String password = "é".repeat(36); // 72 bytes in UTF-8
+        when(authService.register("alice", password)).thenReturn(TestData.user(UUID.randomUUID(), "alice"));
+
+        mvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"alice\",\"password\":\"" + password + "\"}"))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void loginReturns400OnOversizedInputWithoutHashing() throws Exception {
+        mvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"" + "u".repeat(51) + "\",\"password\":\"" + "p".repeat(73) + "\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[*].field", containsInAnyOrder("username", "password")));
         verifyNoInteractions(authService);
     }
 
