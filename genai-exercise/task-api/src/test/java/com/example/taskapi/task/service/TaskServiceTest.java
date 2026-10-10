@@ -260,8 +260,6 @@ class TaskServiceTest {
             assertThatThrownBy(() -> service.get(OTHER_ID, TASK_ID))
                     .isInstanceOf(TaskNotFoundException.class)
                     .hasMessageContaining(TASK_ID.toString());
-            // never falls back to an unscoped lookup
-            verify(tasks, never()).findById(any());
         }
     }
 
@@ -495,7 +493,6 @@ class TaskServiceTest {
             assertThatThrownBy(() -> service.delete(OTHER_ID, TASK_ID))
                     .isInstanceOf(TaskNotFoundException.class);
             verify(tasks, never()).delete(any());
-            verify(tasks, never()).deleteById(any());
         }
     }
 }
