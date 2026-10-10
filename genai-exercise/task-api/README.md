@@ -5,12 +5,15 @@ A REST API for a simple task manager. Java 21, **Spring Boot 4.1.1**, stateless 
 ## Run
 
 ```bash
-./mvnw spring-boot:run          # Windows: mvnw.cmd spring-boot:run
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev     # local only: dev signing secret
+APP_JWT_SECRET=<at least 32 random bytes> ./mvnw spring-boot:run   # any other environment
 ```
+
+(Windows: `mvnw.cmd` instead of `./mvnw`.)
 
 The API listens on `http://localhost:8080/api/v1`. The database is an in-memory H2 instance, so data is lost on restart.
 
-The JWT signing secret comes from `APP_JWT_SECRET`, which must be at least 32 bytes. A dev-only default lives in `application.yml`. **Always set your own secret outside local development.**
+The JWT signing secret comes from `APP_JWT_SECRET`, which must be at least 32 bytes. There is no default: without it the app refuses to start. A local-only secret lives in the `dev` profile (`application-dev.yml`); never activate that profile outside your machine.
 
 ## Test
 

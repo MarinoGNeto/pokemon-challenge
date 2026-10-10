@@ -28,7 +28,8 @@ server:
 
 app:
   jwt:
-    # DEV ONLY. Override with the APP_JWT_SECRET environment variable (>= 32 bytes) everywhere else.
-    secret: ${APP_JWT_SECRET:dev-only-secret-change-me-0123456789abcdef}
+    # No default on purpose: startup fails unless APP_JWT_SECRET (>= 32 bytes) is set.
+    # For local runs only, activate the 'dev' profile (application-dev.yml).
+    secret: ${APP_JWT_SECRET:}
     issuer: task-api
     ttl: 1h

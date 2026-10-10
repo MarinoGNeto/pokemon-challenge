@@ -1,0 +1,4 @@
+# Local development only. Never activate this profile in a shared or deployed environment.
+app:
+  jwt:
+    secret: dev-only-secret-change-me-0123456789abcdef

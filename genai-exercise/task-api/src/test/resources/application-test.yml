@@ -1,0 +1,4 @@
+# Test-only signing secret (activated with @ActiveProfiles("test")).
+app:
+  jwt:
+    secret: test-only-secret-0123456789abcdef-0123456789

@@ -18,7 +18,8 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @ConfigurationProperties(prefix = "app.jwt")
 public record JwtProperties(
-        @NotBlank String secret,
+        @NotBlank(message = "is not configured: set APP_JWT_SECRET (at least 32 bytes) or run with the 'dev' profile")
+        String secret,
         @NotBlank String issuer,
         @NotNull Duration ttl) {
 
