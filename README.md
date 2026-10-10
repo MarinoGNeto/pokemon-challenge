@@ -1,8 +1,5 @@
 # Pokémon Challenge — Spring Boot + React
 
-> 🚧 Work in progress — Java technical interview exercise. This README is the main presentation document
-> (thought process, architecture, setup). It will be completed as the project evolves.
-
 Full-stack application that integrates with [PokeAPI](https://pokeapi.co/docs/v2) to **browse** Pokémon,
 show **detailed** data, **replicate** them into a local PostgreSQL database and **enrich/edit** them with
 proprietary fields — built with **Clean Architecture** and **TDD**.
@@ -26,7 +23,31 @@ proprietary fields — built with **Clean Architecture** and **TDD**.
 | US04 Local modification | Replace proprietary data with optimistic locking; delete (ADMIN) | `PUT /api/local-pokemon/{id}` (signed in), `DELETE …/{id}` (ADMIN) | Edit form and Delete (with confirmation) on `/collection/{id}` |
 
 ## Architecture
-_TBD — diagram + layer description. Decisions: [`docs/DECISIONS.md`](docs/DECISIONS.md)._
+**System:** React (nginx, `:3000`) → `/api` → Spring Boot (`:8080`) → PostgreSQL 17, and → PokeAPI over HTTPS.
+
+**Backend: Clean / Hexagonal** ([ADR-002](docs/DECISIONS.md)). Arrows mean "depends on"; they only point inward.
+
+```mermaid
+flowchart LR
+  web["adapters/in/web<br/>controllers · DTOs · RFC 9457 errors"] --> app
+  pokeapi["adapters/out/pokeapi<br/>RestClient · Caffeine cache"] --> app
+  persistence["adapters/out/persistence<br/>JPA · Flyway"] --> app
+  security["adapters/out/security<br/>BCrypt · JWT"] --> app
+  infra["infrastructure<br/>Spring wiring"] --> app
+  app["application<br/>one class per use case · ports"] --> domain["domain<br/>rules in plain Java"]
+```
+
+- **domain**: Pokémon, evolution tree, local replica, user, and their rules. No Spring, JPA or Jackson.
+- **application**: use cases (`ListPokemon`, `SyncPokemon`, `UpdateLocalPokemon`, …) and the ports they need
+  (`PokemonCatalog`, `LocalPokemonRepository`, `PasswordHasher`, `TokenIssuer`, …). Also framework-free; the use
+  cases are plain classes that `infrastructure` instantiates.
+- **adapters** implement the ports (PokeAPI client, JPA repositories, BCrypt, JWT) or call the use cases (REST).
+  PokeAPI's JSON never leaves `adapters/out/pokeapi`: it is mapped to domain objects at the boundary.
+
+**The dependency rule is tested, not just drawn.** `ArchitectureTest` fails `./mvnw test` if a layer depends
+outward, if `domain` or `application` import a framework, or if a controller reaches an outbound adapter directly.
+`ArchitectureRulesTest` runs the same rules against deliberately broken fixture code, to prove each rule really
+catches its violation.
 
 ## Quick start
 Prerequisites: Docker (Desktop) with Compose v2. Nothing else — no Java, Node or `.env` needed.
@@ -173,9 +194,44 @@ first page **1.2 s**, same page again **12 ms**.
   them green — see `git log --oneline`.
 
 ## GenAI
-- GenAI exercise (task management API): [`genai-exercise/`](genai-exercise/README.md)
-- How AI was used while building this project: [`docs/AI_USAGE.md`](docs/AI_USAGE.md)
-- Guard-rails given to the AI assistant: [`CLAUDE.md`](CLAUDE.md)
+**Exercise ([`genai-exercise/`](genai-exercise/README.md)).** One prompt generated a task-management API; the raw
+output is committed untouched. A strict review found 26 issues (one High: a JWT signing secret committed as a
+fallback); 4 were fixed test-first, one commit each, and the rest are documented with the fix they would need.
+One finding of the AI review itself turned out to be false. Two mutation tests disproved it, so it was withdrawn
+instead of "fixed".
+
+**How AI was used on this project.** Claude Code wrote most of the code and tests. I set the architecture and the
+stack, approved or amended every decision (the AI drafted the ADRs as *Proposed*; [`DECISIONS.md`](docs/DECISIONS.md)
+records what I changed), steered each step, reviewed the results and required them to be verified: tests first,
+then a real run, before moving on. The step-by-step log, with what was rejected or corrected and why, is
+[`docs/AI_USAGE.md`](docs/AI_USAGE.md); the guard-rails given to the AI are in [`CLAUDE.md`](CLAUDE.md) and the
+session's opening prompt in [`docs/KICKOFF_PROMPT.md`](docs/KICKOFF_PROMPT.md).
 
 ## Thought process & trade-offs
-_TBD — requirement interpretation, decisions, what I would do with more time._
+**Reading the stories.** The challenge names fields PokeAPI doesn't have, so each was mapped explicitly
+([ADR-006](docs/DECISIONS.md)): *category* is the species genus ("Seed Pokémon"), *mass* is `weight` converted to
+kg, *skills* are abilities. "Full CRUD" over data that PokeAPI owns was read as: **create = sync from PokeAPI**,
+then read, update and delete our copy. A local Pokémon is split into `catalog` (PokeAPI's, read-only, refreshed on
+every sync) and `proprietary` (ours, editable, kept across re-syncs), so the API makes the ownership visible.
+
+**Decisions and their price.**
+- *Clean Architecture* costs mapping boilerplate (DTO ↔ domain ↔ JPA). Accepted, because it is what keeps the
+  business rules independent of the API and the database, which the challenge asks for, and ArchUnit keeps it so.
+- *PostgreSQL + Testcontainers, no H2*: integration tests run against the real database dialect; the price is
+  that `verify` needs Docker. The unit suite (`./mvnw test`) runs without it.
+- *PokeAPI is slow per page*: its list endpoint returns only names, so a page of 20 needs 41 calls. They run in
+  parallel on virtual threads, capped at 20 concurrent calls, and every response is cached for 24 h:
+  first page 1.2 s, the same page again 12 ms.
+- *Optimistic locking* (`version` in the PUT body → 409) instead of last-write-wins, so two editors can't
+  silently overwrite each other.
+- *JWT with zero setup*: without `JWT_SECRET` the backend signs with a random key per start, so the reviewer
+  needs no `.env`; the price is that tokens don't survive a restart. No secret is ever committed.
+- *Seed data* (Pokémon #1–#12 and two demo users) so the demo works even if PokeAPI is slow.
+
+**Cut on purpose** ([ADR-012](docs/DECISIONS.md)), to finish the must-haves well before the deadline: `PATCH`,
+an admin bulk sync, syncing the first 151 Pokémon on startup (it would hit PokeAPI on every fresh start) and
+MapStruct (mappers are hand-written and unit-tested). Also out of scope: refresh tokens, logout/revocation and
+login rate limiting.
+
+**With more time:** login rate limiting and refresh tokens; `PATCH` for partial updates; search and type filters
+in the Pokédex; and the remaining UI items in the [polish backlog](docs/PLAN.md#polish-backlog-later--not-part-of-the-current-stops).
