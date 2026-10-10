@@ -167,15 +167,43 @@ class TaskControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"title\":"))
                     .andExpect(status().isBadRequest())
-                    .andExpect(content().contentType(PROBLEM_JSON));
+                    .andExpect(content().contentType(PROBLEM_JSON))
+                    .andExpect(jsonPath("$.title").value("Validation failed"))
+                    .andExpect(jsonPath("$.errors[0].field").value("body"))
+                    .andExpect(jsonPath("$.errors[0].message").value("is not valid JSON"));
+            verifyNoInteractions(taskService);
         }
 
         @Test
-        void returns400OnUnknownStatusValue() throws Exception {
+        void returns400WithFieldErrorOnUnknownStatusValue() throws Exception {
             mvc.perform(post("/api/v1/tasks").with(caller())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"title\":\"t\",\"status\":\"ARCHIVED\"}"))
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().contentType(PROBLEM_JSON))
+                    .andExpect(jsonPath("$.errors", hasSize(1)))
+                    .andExpect(jsonPath("$.errors[0].field").value("status"))
+                    .andExpect(jsonPath("$.errors[0].message").value("must be one of [TODO, IN_PROGRESS, DONE]"));
+            verifyNoInteractions(taskService);
+        }
+
+        @Test
+        void returns400WithFieldErrorOnInvalidDueDate() throws Exception {
+            mvc.perform(post("/api/v1/tasks").with(caller())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"title\":\"t\",\"dueDate\":\"2030-13-01\"}"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors[0].field").value("dueDate"))
+                    .andExpect(jsonPath("$.errors[0].message").value("must be an ISO-8601 date (yyyy-MM-dd)"));
+            verifyNoInteractions(taskService);
+        }
+
+        @Test
+        void returns400WhenBodyIsMissing() throws Exception {
+            mvc.perform(post("/api/v1/tasks").with(caller()).contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors[0].field").value("body"))
+                    .andExpect(jsonPath("$.errors[0].message").value("is missing or unreadable"));
         }
     }
 
@@ -263,10 +291,20 @@ class TaskControllerTest {
         }
 
         @Test
-        void listReturns400OnInvalidDueBefore() throws Exception {
+        void listReturns400WithFieldErrorOnInvalidDueBefore() throws Exception {
             mvc.perform(get("/api/v1/tasks").with(caller()).param("dueBefore", "tomorrow"))
                     .andExpect(status().isBadRequest())
-                    .andExpect(content().contentType(PROBLEM_JSON));
+                    .andExpect(content().contentType(PROBLEM_JSON))
+                    .andExpect(jsonPath("$.errors[0].field").value("dueBefore"))
+                    .andExpect(jsonPath("$.errors[0].message").value("must be an ISO-8601 date (yyyy-MM-dd)"));
+        }
+
+        @Test
+        void listReturns400WithFieldErrorOnUnknownStatusFilter() throws Exception {
+            mvc.perform(get("/api/v1/tasks").with(caller()).param("status", "ARCHIVED"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors[0].field").value("status"))
+                    .andExpect(jsonPath("$.errors[0].message").value("must be one of [TODO, IN_PROGRESS, DONE]"));
         }
 
         @Test
@@ -292,9 +330,12 @@ class TaskControllerTest {
         }
 
         @Test
-        void getReturns400OnMalformedId() throws Exception {
+        void getReturns400WithFieldErrorOnMalformedId() throws Exception {
             mvc.perform(get("/api/v1/tasks/not-a-uuid").with(caller()))
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().contentType(PROBLEM_JSON))
+                    .andExpect(jsonPath("$.errors[0].field").value("id"))
+                    .andExpect(jsonPath("$.errors[0].message").value("must be a valid UUID"));
         }
     }
 
@@ -379,6 +420,16 @@ class TaskControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.status").value("DONE"))
                     .andExpect(jsonPath("$.version").value(2));
+        }
+
+        @Test
+        void returns400WithFieldErrorWhenVersionIsNotANumber() throws Exception {
+            mvc.perform(patch("/api/v1/tasks/{id}/status", TASK_ID).with(caller())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"status\":\"DONE\",\"version\":\"abc\"}"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors[0].field").value("version"))
+                    .andExpect(jsonPath("$.errors[0].message").value("must be a number"));
         }
 
         @Test
