@@ -19,7 +19,7 @@ proprietary fields — built with **Clean Architecture** and **TDD**.
 |---|---|---|---|
 | US01 Enumeration | Paginated list with sprite, category, mass (kg), skills (cached) | `GET /api/pokemon?page=0&size=20` (public) | `/pokedex?page=1` |
 | US02 Detailed view | Official artwork, 6 core stats + total, English description, evolution tree with branches and conditions | `GET /api/pokemon/{id}` (public) | `/pokedex/{id}` |
-| US03 Synchronization | Idempotent replication into PostgreSQL; proprietary fields (localized name, region, habitat, tags, notes) survive re-syncs | `POST /api/local-pokemon` (signed in), `GET /api/local-pokemon[/{id}]` (public) | "Add to my collection" on `/pokedex/{id}`; `/collection`, `/collection/{id}` |
+| US03 Synchronization | Idempotent replication into PostgreSQL; proprietary fields (localized name, region, habitat, tags, notes) survive re-syncs | `POST /api/local-pokemon` (signed in), `GET /api/local-pokemon[/{id}]` (public) | "Add to the collection" on `/pokedex/{id}`; "Team collection" at `/collection`, `/collection/{id}` |
 | US04 Local modification | Replace proprietary data with optimistic locking; delete (ADMIN) | `PUT /api/local-pokemon/{id}` (signed in), `DELETE …/{id}` (ADMIN) | Edit form and Delete (with confirmation) on `/collection/{id}` |
 
 ## Architecture
@@ -114,7 +114,7 @@ screen while the next loads, no retries on 4xx); feature folders (`features/poke
 the server's RFC 9457 title and detail; field errors from the server land on the matching input.
 
 Signing in (`/login`, `/register`) keeps the session in memory + sessionStorage and always returns to the page you
-came from (e.g. "Sign in to add Eevee to your collection" → back on Eevee). Forms use React Hook Form + Zod with the
+came from (e.g. "Sign in to add Eevee to the collection" → back on Eevee). Forms use React Hook Form + Zod with the
 backend's own rules (username format, password 8 chars–72 bytes, tag format, lengths), so most mistakes are caught
 before a request; a 409 on save offers to load the latest version; a 401 signs you out with an explanation. Delete
 is shown to admins only and asks for confirmation (focus on Cancel, Escape closes). Visual direction "field device readout": cool neutral surfaces, one brand red

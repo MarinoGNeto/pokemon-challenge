@@ -29,7 +29,7 @@ export function AppShell() {
               </li>
               <li>
                 <NavLink to="/collection" className={({ isActive }) => (isActive ? styles.active : undefined)}>
-                  Collection
+                  Team collection
                 </NavLink>
               </li>
             </ul>

@@ -20,7 +20,7 @@ export function CollectionPage() {
   return (
     <section aria-labelledby="collection-title">
       <div className={styles.heading}>
-        <h1 id="collection-title">Collection</h1>
+        <h1 id="collection-title">Team collection</h1>
         {query.data && query.data.totalElements > 0 && (
           <p className={styles.count}>{query.data.totalElements} Pokémon stored locally</p>
         )}

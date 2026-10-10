@@ -23,19 +23,19 @@ export function AddToCollection({ pokeApiId, name }: { pokeApiId: number; name: 
           onClick={() => sync.mutate(pokeApiId)}
           disabled={sync.isPending}
         >
-          {sync.isPending ? 'Adding…' : 'Add to my collection'}
+          {sync.isPending ? 'Adding…' : 'Add to the collection'}
         </button>
       ) : (
-        <SignInLink className={styles.signIn}>Sign in to add {label} to your collection</SignInLink>
+        <SignInLink className={styles.signIn}>Sign in to add {label} to the collection</SignInLink>
       )}
       {sync.isSuccess && (
         <output className={styles.done}>
           <span>
             {sync.data.created
-              ? `${label} was added to your collection.`
-              : `${label} is already in your collection. Its PokeAPI data was refreshed.`}
+              ? `${label} was added to the collection.`
+              : `${label} is already in the collection. Its PokeAPI data was refreshed.`}
           </span>{' '}
-          <Link to={`/collection/${sync.data.pokemon.id}`}>View it in your collection</Link>
+          <Link to={`/collection/${sync.data.pokemon.id}`}>View it in the collection</Link>
         </output>
       )}
       {sync.isError && !expired && <ProblemMessage error={sync.error} />}

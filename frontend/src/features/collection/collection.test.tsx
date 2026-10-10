@@ -22,13 +22,13 @@ describe('Adding to the collection (US03)', () => {
     const user = userEvent.setup()
     const { router } = renderRoute('/pokedex/133')
 
-    await user.click(await screen.findByRole('link', { name: 'Sign in to add Eevee to your collection' }))
+    await user.click(await screen.findByRole('link', { name: 'Sign in to add Eevee to the collection' }))
     await user.type(await screen.findByLabelText('Username'), 'ash')
     await user.type(screen.getByLabelText('Password'), 'pikachu-123')
     await user.click(screen.getByRole('button', { name: 'Sign in' }))
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/pokedex/133'))
-    expect(await screen.findByRole('button', { name: 'Add to my collection' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Add to the collection' })).toBeInTheDocument()
   })
 
   it('adds the Pokémon with the signed-in token and links to the copy', async () => {
@@ -43,11 +43,11 @@ describe('Adding to the collection (US03)', () => {
     const user = userEvent.setup()
     renderRoute('/pokedex/133', { session: userSession })
 
-    await user.click(await screen.findByRole('button', { name: 'Add to my collection' }))
+    await user.click(await screen.findByRole('button', { name: 'Add to the collection' }))
 
-    const status = await screen.findByText('Eevee was added to your collection.')
+    const status = await screen.findByText('Eevee was added to the collection.')
     expect(status.closest('[role="status"], output')).not.toBeNull()
-    expect(screen.getByRole('link', { name: 'View it in your collection' })).toHaveAttribute('href', '/collection/7')
+    expect(screen.getByRole('link', { name: 'View it in the collection' })).toHaveAttribute('href', '/collection/7')
     expect(request).toEqual({ auth: 'Bearer user.jwt.token', body: { pokeApiId: 133 } })
   })
 
@@ -57,10 +57,10 @@ describe('Adding to the collection (US03)', () => {
     const user = userEvent.setup()
     renderRoute('/pokedex/133', { session: userSession })
 
-    await user.click(await screen.findByRole('button', { name: 'Add to my collection' }))
+    await user.click(await screen.findByRole('button', { name: 'Add to the collection' }))
 
     expect(
-      await screen.findByText('Eevee is already in your collection. Its PokeAPI data was refreshed.'),
+      await screen.findByText('Eevee is already in the collection. Its PokeAPI data was refreshed.'),
     ).toBeInTheDocument()
   })
 
@@ -77,10 +77,10 @@ describe('Adding to the collection (US03)', () => {
     const user = userEvent.setup()
     renderRoute('/pokedex/133', { session: userSession })
 
-    await user.click(await screen.findByRole('button', { name: 'Add to my collection' }))
+    await user.click(await screen.findByRole('button', { name: 'Add to the collection' }))
 
     expect(await screen.findByText('Your session has expired. Sign in again to continue.')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Sign in to add Eevee to your collection' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Sign in to add Eevee to the collection' })).toBeInTheDocument()
     expect(sessionStorage.getItem(SESSION_KEY)).toBeNull()
   })
 })
@@ -99,6 +99,10 @@ describe('Collection list', () => {
 
     const entry = await screen.findByRole('link', { name: /Bulbasaur/ })
     expect(entry).toHaveAttribute('href', '/collection/1')
+    // One shared team catalogue, not a personal list: no "my/your collection" anywhere.
+    expect(screen.getByRole('heading', { level: 1, name: 'Team collection' })).toBeInTheDocument()
+    expect(within(screen.getByRole('navigation', { name: 'Main' })).getByRole('link', { name: 'Team collection' }))
+      .toHaveAttribute('href', '/collection')
     expect(within(entry).getByText('#0001')).toBeInTheDocument()
     expect(within(entry).getByText('フシギダネ')).toBeInTheDocument()
     expect(within(entry).getByText('Kanto')).toBeInTheDocument()
