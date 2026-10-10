@@ -64,11 +64,12 @@ Compose v5.5.1, git 2.56.0, identity `MarinoGNeto <marino.goncalvesneto@gmail.co
       (button, sign-in prompt, success/refresh messages, "View it in …" link)
 
 ## 4. Sunday morning — GenAI exercise, docs, final QA
-- [ ] `genai-exercise/`: prompt → raw output commit → review commits → write-up (see its README)
-- [ ] README final: overview, user story mapping, architecture diagram, setup, credentials, API table,
+- [x] `genai-exercise/`: prompt → raw output commit → review commits → write-up (see its README)
+- [x] README final: overview, user story mapping, architecture diagram, setup, credentials, API table,
       testing & coverage, trade-offs, what I'd do next, AI usage summary
 - [ ] Fresh clone in another folder → `docker compose up --build` → smoke test the demo script
-- [ ] Check: no symlinks (`git ls-files -s | findstr ^120000` returns nothing), no secrets, PDF not committed
+- [x] Check: no symlinks (`git ls-files -s | findstr ^120000` returns nothing), no secrets, PDF not committed
+      (2026-10-10; the only committed keys are the documented dev/test-only ones in `genai-exercise/task-api`; re-check last)
 - [ ] Repo public, default branch `main`, then reply to the recruiter with **only** the repo link
 
 ## Demo script (for the presentation)
