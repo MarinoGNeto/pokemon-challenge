@@ -6,9 +6,10 @@ Use the checkboxes as the single progress tracker. Each item should link to the 
 ## Recruiter e-mail (submission rules)
 
 - [x] Send a presentation of the thought process (README / text file) — `README.md` (Architecture, Thought process & trade-offs) + `docs/`
-- [ ] Send **one** GitHub link only, repository **public**, everything in one repo
+- [x] Send **one** GitHub link only, repository **public**, everything in one repo — submitted: https://github.com/MarinoGNeto/pokemon-challenge
 - [x] GenAI portion is a **must** — `genai-exercise/`
-- [ ] Deadline **Sunday 11 Oct 2026, 18:00 BRT**; no changes after submission
+- [x] Deadline **Sunday 11 Oct 2026, 18:00 BRT**; no changes after submission — submitted on time; the only later
+      commit (2026-10-19) ticks these checkboxes after the process closed
 - [x] **No symlinks** in the repository — `git ls-files -s` has no mode `120000` (checked 2026-10-10; re-check before submitting)
 
 ## Project overview

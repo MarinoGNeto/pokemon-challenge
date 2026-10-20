@@ -70,7 +70,7 @@ Compose v5.5.1, git 2.56.0, identity `MarinoGNeto <marino.goncalvesneto@gmail.co
 - [ ] Fresh clone in another folder → `docker compose up --build` → smoke test the demo script
 - [x] Check: no symlinks (`git ls-files -s | findstr ^120000` returns nothing), no secrets, PDF not committed
       (2026-10-10; the only committed keys are the documented dev/test-only ones in `genai-exercise/task-api`; re-check last)
-- [ ] Repo public, default branch `main`, then reply to the recruiter with **only** the repo link
+- [x] Repo public, default branch `main`, then reply to the recruiter with **only** the repo link
 
 ## Demo script (for the presentation)
 1. Architecture tour (README diagram → packages → ArchUnit test)
